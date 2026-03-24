@@ -11,6 +11,9 @@
       "Bash(git checkout *)",
       "Bash(git branch *)",
       "Bash(ls *)",
+      "Bash(bash .claude/scripts/*)",
+      "Bash(find . *)",
+      "Bash(cat CLAUDE.md *)",
       "Read",
       "Write",
       "Edit",
@@ -23,6 +26,14 @@
       "Bash(wget *)",
       "Read(./.env)",
       "Read(./.env.*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "command": "bash .claude/scripts/guardian-check.sh"
+      }
     ]
   }
 }
