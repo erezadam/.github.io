@@ -1,0 +1,11 @@
+# Personal Claude Code settings (not shared with team)
+CLAUDE.local.md
+.claude/settings.local.json
+
+# Environment files
+.env
+.env.*
+
+# OS files
+.DS_Store
+Thumbs.db
