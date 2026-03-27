@@ -14,11 +14,40 @@
     <script type="text/babel">
         // קוד ה-React כאן
         const LandingPage = () => {
-            const [activeSection, setActiveSection] = React.useState('author');
+            const [activeSection, setActiveSection] = React.useState('updates');
             const [authorImage, setAuthorImage] = React.useState(null);
             const [bookImage, setBookImage] = React.useState(null);
             const [authorText, setAuthorText] = React.useState('');
             const [bookSummary, setBookSummary] = React.useState('');
+
+            const recentUpdates = [
+                {
+                    date: '2026-03-27',
+                    title: 'פרק חדש זמין לקריאה',
+                    summary: 'פרק 12 של "זהבה" זמין כעת לקריאה מוקדמת. הפרק חושף את סודות העבר של הדמות המרכזית.'
+                },
+                {
+                    date: '2026-03-27',
+                    title: 'מפגש קוראים וירטואלי',
+                    summary: 'הצטרפו למפגש קוראים וירטואלי עם אדם אסא ביום שישי הקרוב בשעה 20:00. הרשמה בקישור באתר.'
+                },
+                {
+                    date: '2026-03-26',
+                    title: 'ביקורת חדשה בעיתון',
+                    summary: '"זהבה" קיבלה ביקורת נלהבת בעיתון הארץ - "ספר שחובה לקרוא, מרגש ומפתיע בכל עמוד".'
+                },
+                {
+                    date: '2026-03-26',
+                    title: 'הספר ברשימת רבי המכר',
+                    summary: '"זהבה" נכנסה לרשימת רבי המכר של סטימצקי למקום השלישי! תודה לכל הקוראים והקוראות.'
+                }
+            ];
+
+            const formatDate = (dateStr) => {
+                const date = new Date(dateStr);
+                return date.toLocaleDateString('he-IL', { day: 'numeric', month: 'long', year: 'numeric' });
+            };
+
             const [contactForm, setContactForm] = React.useState({
                 firstName: '',
                 lastName: '',
@@ -44,12 +73,12 @@
                     {/* Navigation */}
                     <nav className="bg-white shadow-lg p-4 sticky top-0">
                         <div className="max-w-4xl mx-auto flex justify-around">
-                            {['הסופרת', 'על הספר', 'פרטים להתקשרות'].map((section, index) => (
+                            {['חדשות אחרונות', 'הסופרת', 'על הספר', 'פרטים להתקשרות'].map((section, index) => (
                                 <button
                                     key={section}
-                                    onClick={() => setActiveSection(['author', 'book', 'contact'][index])}
+                                    onClick={() => setActiveSection(['updates', 'author', 'book', 'contact'][index])}
                                     className={`px-6 py-2 rounded-full ${
-                                        activeSection === ['author', 'book', 'contact'][index]
+                                        activeSection === ['updates', 'author', 'book', 'contact'][index]
                                             ? 'bg-purple-200 text-purple-800'
                                             : 'text-gray-600 hover:bg-purple-100'
                                     }`}
@@ -62,6 +91,24 @@
 
                     {/* Main Content */}
                     <main className="max-w-4xl mx-auto p-6">
+                        {/* Updates Section */}
+                        <section className={`mb-16 ${activeSection === 'updates' ? '' : 'hidden'}`}>
+                            <h2 className="text-3xl font-bold text-purple-800 text-center mb-8">חדשות אחרונות</h2>
+                            <div className="space-y-6">
+                                {recentUpdates.map((update, index) => (
+                                    <div key={index} className="bg-white rounded-lg shadow-md p-6 border-r-4 border-purple-400 hover:shadow-lg transition-shadow">
+                                        <div className="flex justify-between items-start mb-2">
+                                            <h3 className="text-xl font-semibold text-gray-800">{update.title}</h3>
+                                            <span className="text-sm text-purple-600 bg-purple-50 px-3 py-1 rounded-full whitespace-nowrap mr-4">
+                                                {formatDate(update.date)}
+                                            </span>
+                                        </div>
+                                        <p className="text-gray-600 leading-relaxed">{update.summary}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+
                         {/* Author Section */}
                         <section className={`mb-16 ${activeSection === 'author' ? '' : 'hidden'}`}>
                             <div className="grid grid-cols-2 gap-8">
