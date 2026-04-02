@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>אפקט זום תמונות</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0a0a0a; color: #fff; overflow-x: hidden; }
+
+        .app-container { display: flex; flex-direction: column; min-height: 100vh; }
+
+        /* Controls Panel */
+        .controls-panel {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            padding: 20px 30px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            z-index: 100;
+        }
+        .controls-title {
+            font-size: 28px;
+            font-weight: bold;
+            background: linear-gradient(90deg, #e94560, #0f3460, #e94560);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 3s linear infinite;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        @keyframes shimmer { to { background-position: -200% center; } }
+
+        .controls-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .upload-btn, .action-btn {
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: 2px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .upload-btn:hover, .action-btn:hover {
+            background: rgba(255,255,255,0.15);
+            border-color: #e94560;
+            transform: translateY(-2px);
+        }
+        .action-btn.primary {
+            background: linear-gradient(135deg, #e94560, #c23152);
+            border-color: #e94560;
+        }
+        .action-btn.primary:hover {
+            background: linear-gradient(135deg, #ff5a7e, #e94560);
+        }
+        .action-btn.stop {
+            background: linear-gradient(135deg, #333, #555);
+            border-color: #666;
+        }
+
+        .bg-options {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .bg-swatch {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 2px solid rgba(255,255,255,0.2);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .bg-swatch:hover, .bg-swatch.active {
+            border-color: #e94560;
+            transform: scale(1.15);
+            box-shadow: 0 0 12px rgba(233,69,96,0.5);
+        }
+
+        .slider-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .slider-group label { font-size: 13px; color: #aaa; white-space: nowrap; }
+        .slider-group input[type="range"] {
+            width: 100px;
+            accent-color: #e94560;
+        }
+        .slider-group .val { font-size: 13px; color: #e94560; min-width: 30px; }
+
+        /* Thumbnails */
+        .thumbs-row {
+            display: flex;
+            gap: 10px;
+            padding: 10px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .thumb-wrap {
+            position: relative;
+            width: 70px;
+            height: 70px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid rgba(255,255,255,0.15);
+            cursor: grab;
+            transition: all 0.3s;
+        }
+        .thumb-wrap:hover { border-color: #e94560; }
+        .thumb-wrap.dragging { opacity: 0.4; }
+        .thumb-wrap.drag-over { border-color: #0f3460; border-width: 3px; }
+        .thumb-wrap img { width: 100%; height: 100%; object-fit: cover; }
+        .thumb-remove {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: rgba(233,69,96,0.9);
+            border: none;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .thumb-wrap:hover .thumb-remove { opacity: 1; }
+
+        /* Slideshow Viewport */
+        .slideshow-viewport {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 500px;
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .slide img {
+            max-width: 85%;
+            max-height: 85%;
+            object-fit: contain;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+        }
+
+        /* Animations */
+        @keyframes zoomInFade {
+            0% { transform: scale(0.5) rotate(-2deg); opacity: 0; filter: blur(8px); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; filter: blur(0); }
+        }
+        @keyframes zoomOutFade {
+            0% { transform: scale(1) rotate(0deg); opacity: 1; filter: blur(0); }
+            100% { transform: scale(1.8) rotate(2deg); opacity: 0; filter: blur(8px); }
+        }
+        @keyframes kenBurns {
+            0% { transform: scale(1) translate(0, 0); }
+            100% { transform: scale(1.15) translate(-2%, -1%); }
+        }
+        @keyframes kenBurnsAlt {
+            0% { transform: scale(1) translate(0, 0); }
+            100% { transform: scale(1.15) translate(2%, 1%); }
+        }
+
+        .slide-enter {
+            animation: zoomInFade var(--transition-speed) cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .slide-exit {
+            animation: zoomOutFade var(--transition-speed) cubic-bezier(0.7, 0, 0.84, 0) forwards;
+        }
+        .slide-active img {
+            animation: kenBurns var(--slide-duration) ease-in-out forwards;
+        }
+        .slide-active-alt img {
+            animation: kenBurnsAlt var(--slide-duration) ease-in-out forwards;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        .empty-state .icon { font-size: 80px; margin-bottom: 20px; opacity: 0.3; }
+        .empty-state p { font-size: 18px; color: #666; }
+
+        /* Progress bar */
+        .progress-bar-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            z-index: 10;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #e94560, #0f3460);
+            transition: width 0.1s linear;
+        }
+
+        /* Image counter */
+        .image-counter {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.6);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #ccc;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Dots */
+        .dots-row {
+            position: absolute;
+            bottom: 55px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .dot.active {
+            background: #e94560;
+            transform: scale(1.3);
+            box-shadow: 0 0 10px rgba(233,69,96,0.6);
+        }
+
+        .hidden-input { display: none; }
+
+        /* Fullscreen */
+        .fullscreen-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            z-index: 10;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+        .fullscreen-btn:hover { background: rgba(233,69,96,0.6); }
+
+        @media (max-width: 640px) {
+            .controls-row { flex-direction: column; align-items: stretch; }
+            .controls-row > * { justify-content: center; }
+            .slideshow-viewport { min-height: 350px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+    const { useState, useRef, useEffect, useCallback } = React;
+
+    const BACKGROUNDS = [
+        { id: 'dark', label: 'כהה', style: { background: '#0a0a0a' } },
+        { id: 'gradient1', label: 'שקיעה', style: { background: 'linear-gradient(135deg, #0c0c1d, #1a0a2e, #2d1b4e, #1a0a2e)' } },
+        { id: 'gradient2', label: 'אוקיינוס', style: { background: 'linear-gradient(135deg, #0a192f, #0d2137, #0a3d62)' } },
+        { id: 'gradient3', label: 'יער', style: { background: 'linear-gradient(135deg, #0a1a0a, #1a2f1a, #0d260d)' } },
+        { id: 'gradient4', label: 'זהב', style: { background: 'linear-gradient(135deg, #1a1a0a, #2f2a1a, #3d2e0d)' } },
+        { id: 'light', label: 'בהיר', style: { background: '#f0f0f0' } },
+        { id: 'white', label: 'לבן', style: { background: '#ffffff' } },
+        { id: 'blur', label: 'טשטוש', style: {} },
+    ];
+
+    function App() {
+        const [images, setImages] = useState([]);
+        const [currentIndex, setCurrentIndex] = useState(0);
+        const [prevIndex, setPrevIndex] = useState(-1);
+        const [isPlaying, setIsPlaying] = useState(false);
+        const [bgChoice, setBgChoice] = useState('dark');
+        const [customBg, setCustomBg] = useState(null);
+        const [slideDuration, setSlideDuration] = useState(3);
+        const [transitionSpeed, setTransitionSpeed] = useState(1);
+        const [progress, setProgress] = useState(0);
+        const [isFullscreen, setIsFullscreen] = useState(false);
+
+        const fileInputRef = useRef(null);
+        const bgInputRef = useRef(null);
+        const timerRef = useRef(null);
+        const progressRef = useRef(null);
+        const viewportRef = useRef(null);
+        const dragIndexRef = useRef(null);
+
+        // Handle image upload
+        const handleImageUpload = (e) => {
+            const files = Array.from(e.target.files);
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    setImages(prev => [...prev, { id: Date.now() + Math.random(), src: reader.result }]);
+                };
+                reader.readAsDataURL(file);
+            });
+            e.target.value = '';
+        };
+
+        // Handle background upload
+        const handleBgUpload = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    setCustomBg(reader.result);
+                    setBgChoice('custom');
+                };
+                reader.readAsDataURL(file);
+            }
+            e.target.value = '';
+        };
+
+        // Remove image
+        const removeImage = (id) => {
+            setImages(prev => {
+                const next = prev.filter(img => img.id !== id);
+                if (currentIndex >= next.length && next.length > 0) {
+                    setCurrentIndex(next.length - 1);
+                }
+                if (next.length <= 1) setIsPlaying(false);
+                return next;
+            });
+        };
+
+        // Go to next slide
+        const goNext = useCallback(() => {
+            if (images.length <= 1) return;
+            setPrevIndex(currentIndex);
+            setCurrentIndex(prev => (prev + 1) % images.length);
+            setProgress(0);
+        }, [currentIndex, images.length]);
+
+        // Go to specific slide
+        const goTo = (idx) => {
+            if (idx === currentIndex) return;
+            setPrevIndex(currentIndex);
+            setCurrentIndex(idx);
+            setProgress(0);
+        };
+
+        // Play/pause
+        useEffect(() => {
+            if (isPlaying && images.length > 1) {
+                const totalMs = slideDuration * 1000;
+                const step = 50;
+                let elapsed = 0;
+
+                clearInterval(timerRef.current);
+                clearInterval(progressRef.current);
+
+                progressRef.current = setInterval(() => {
+                    elapsed += step;
+                    setProgress((elapsed / totalMs) * 100);
+                }, step);
+
+                timerRef.current = setInterval(() => {
+                    goNext();
+                    elapsed = 0;
+                }, totalMs);
+
+                return () => {
+                    clearInterval(timerRef.current);
+                    clearInterval(progressRef.current);
+                };
+            } else {
+                clearInterval(timerRef.current);
+                clearInterval(progressRef.current);
+                setProgress(0);
+            }
+        }, [isPlaying, images.length, slideDuration, goNext]);
+
+        // Fullscreen
+        const toggleFullscreen = () => {
+            if (!document.fullscreenElement) {
+                viewportRef.current?.requestFullscreen();
+                setIsFullscreen(true);
+            } else {
+                document.exitFullscreen();
+                setIsFullscreen(false);
+            }
+        };
+
+        useEffect(() => {
+            const handler = () => setIsFullscreen(!!document.fullscreenElement);
+            document.addEventListener('fullscreenchange', handler);
+            return () => document.removeEventListener('fullscreenchange', handler);
+        }, []);
+
+        // Keyboard
+        useEffect(() => {
+            const handler = (e) => {
+                if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    if (e.key === 'ArrowLeft') {
+                        goTo((currentIndex + 1) % images.length);
+                    } else {
+                        goTo((currentIndex - 1 + images.length) % images.length);
+                    }
+                } else if (e.key === ' ') {
+                    e.preventDefault();
+                    if (images.length > 1) setIsPlaying(p => !p);
+                } else if (e.key === 'f' || e.key === 'F') {
+                    toggleFullscreen();
+                }
+            };
+            window.addEventListener('keydown', handler);
+            return () => window.removeEventListener('keydown', handler);
+        }, [currentIndex, images.length]);
+
+        // Drag & drop reorder
+        const handleDragStart = (idx) => { dragIndexRef.current = idx; };
+        const handleDragOver = (e) => { e.preventDefault(); };
+        const handleDrop = (targetIdx) => {
+            const fromIdx = dragIndexRef.current;
+            if (fromIdx === null || fromIdx === targetIdx) return;
+            setImages(prev => {
+                const copy = [...prev];
+                const [moved] = copy.splice(fromIdx, 1);
+                copy.splice(targetIdx, 0, moved);
+                return copy;
+            });
+            dragIndexRef.current = null;
+        };
+
+        // Background style
+        const getBgStyle = () => {
+            if (bgChoice === 'custom' && customBg) {
+                return { backgroundImage: `url(${customBg})`, backgroundSize: 'cover', backgroundPosition: 'center' };
+            }
+            if (bgChoice === 'blur' && images.length > 0) {
+                return {};
+            }
+            const bg = BACKGROUNDS.find(b => b.id === bgChoice);
+            return bg ? bg.style : { background: '#0a0a0a' };
+        };
+
+        const cssVars = {
+            '--transition-speed': `${transitionSpeed}s`,
+            '--slide-duration': `${slideDuration}s`,
+        };
+
+        return (
+            <div className="app-container" style={cssVars}>
+                {/* Controls */}
+                <div className="controls-panel">
+                    <div className="controls-title">אפקט זום תמונות מתחלף</div>
+                    <div className="controls-row">
+                        <button className="upload-btn" onClick={() => fileInputRef.current.click()}>
+                            📸 העלאת תמונות
+                        </button>
+                        <input ref={fileInputRef} type="file" accept="image/*" multiple
+                            className="hidden-input" onChange={handleImageUpload} />
+
+                        <div className="bg-options">
+                            <span style={{fontSize: '13px', color: '#aaa'}}>רקע:</span>
+                            {BACKGROUNDS.map(bg => (
+                                <div key={bg.id}
+                                    className={`bg-swatch ${bgChoice === bg.id ? 'active' : ''}`}
+                                    style={bg.id === 'blur'
+                                        ? { background: 'linear-gradient(135deg, #666, #999)', position: 'relative', overflow: 'hidden' }
+                                        : bg.style}
+                                    title={bg.label}
+                                    onClick={() => setBgChoice(bg.id)}
+                                />
+                            ))}
+                            <button className="upload-btn" style={{padding: '6px 12px', fontSize: '12px'}}
+                                onClick={() => bgInputRef.current.click()}>
+                                🖼️ רקע מותאם
+                            </button>
+                            <input ref={bgInputRef} type="file" accept="image/*"
+                                className="hidden-input" onChange={handleBgUpload} />
+                        </div>
+
+                        <div className="slider-group">
+                            <label>משך:</label>
+                            <input type="range" min="1" max="10" step="0.5" value={slideDuration}
+                                onChange={e => setSlideDuration(Number(e.target.value))} />
+                            <span className="val">{slideDuration}s</span>
+                        </div>
+
+                        <div className="slider-group">
+                            <label>מעבר:</label>
+                            <input type="range" min="0.3" max="2" step="0.1" value={transitionSpeed}
+                                onChange={e => setTransitionSpeed(Number(e.target.value))} />
+                            <span className="val">{transitionSpeed}s</span>
+                        </div>
+
+                        {images.length > 1 && (
+                            <button className={`action-btn ${isPlaying ? 'stop' : 'primary'}`}
+                                onClick={() => setIsPlaying(p => !p)}>
+                                {isPlaying ? '⏸ עצור' : '▶ הפעל'}
+                            </button>
+                        )}
+                    </div>
+
+                    {/* Thumbnails */}
+                    {images.length > 0 && (
+                        <div className="thumbs-row">
+                            {images.map((img, idx) => (
+                                <div key={img.id}
+                                    className={`thumb-wrap ${idx === currentIndex ? 'active' : ''}`}
+                                    style={idx === currentIndex ? {borderColor: '#e94560', boxShadow: '0 0 12px rgba(233,69,96,0.5)'} : {}}
+                                    draggable
+                                    onDragStart={() => handleDragStart(idx)}
+                                    onDragOver={handleDragOver}
+                                    onDrop={() => handleDrop(idx)}
+                                    onClick={() => goTo(idx)}
+                                >
+                                    <img src={img.src} alt="" />
+                                    <button className="thumb-remove" onClick={(e) => { e.stopPropagation(); removeImage(img.id); }}>✕</button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {/* Slideshow */}
+                <div className="slideshow-viewport" ref={viewportRef} style={getBgStyle()}>
+                    {/* Blur background */}
+                    {bgChoice === 'blur' && images.length > 0 && (
+                        <div style={{
+                            position: 'absolute', inset: 0,
+                            backgroundImage: `url(${images[currentIndex]?.src})`,
+                            backgroundSize: 'cover', backgroundPosition: 'center',
+                            filter: 'blur(40px) brightness(0.4)', transform: 'scale(1.2)',
+                        }} />
+                    )}
+
+                    {images.length === 0 ? (
+                        <div className="empty-state">
+                            <div className="icon">🖼️</div>
+                            <p>העלה תמונות כדי להתחיל</p>
+                            <p style={{fontSize: '14px', color: '#444', marginTop: '10px'}}>
+                                ניתן לגרור ולשנות סדר • מקשי חצים לניווט • רווח להפעלה/עצירה • F למסך מלא
+                            </p>
+                        </div>
+                    ) : (
+                        <>
+                            {/* Previous slide (exit animation) */}
+                            {prevIndex >= 0 && prevIndex < images.length && (
+                                <div key={`exit-${images[prevIndex].id}-${prevIndex}`}
+                                    className="slide slide-exit"
+                                    onAnimationEnd={() => setPrevIndex(-1)}>
+                                    <img src={images[prevIndex].src} alt="" />
+                                </div>
+                            )}
+
+                            {/* Current slide (enter + ken burns) */}
+                            <div key={`enter-${images[currentIndex]?.id}-${currentIndex}`}
+                                className={`slide slide-enter ${currentIndex % 2 === 0 ? 'slide-active' : 'slide-active-alt'}`}>
+                                <img src={images[currentIndex]?.src} alt="" />
+                            </div>
+
+                            {/* Dots */}
+                            {images.length > 1 && images.length <= 20 && (
+                                <div className="dots-row">
+                                    {images.map((_, idx) => (
+                                        <div key={idx}
+                                            className={`dot ${idx === currentIndex ? 'active' : ''}`}
+                                            onClick={() => goTo(idx)} />
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* Counter */}
+                            <div className="image-counter">
+                                {currentIndex + 1} / {images.length}
+                            </div>
+
+                            {/* Progress */}
+                            {isPlaying && (
+                                <div className="progress-bar-container">
+                                    <div className="progress-bar" style={{width: `${progress}%`}} />
+                                </div>
+                            )}
+                        </>
+                    )}
+
+                    {/* Fullscreen button */}
+                    <button className="fullscreen-btn" onClick={toggleFullscreen}
+                        title="מסך מלא (F)">
+                        {isFullscreen ? '⊡' : '⊞'}
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>
