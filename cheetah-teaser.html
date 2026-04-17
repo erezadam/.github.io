@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cheetah Teaser — 15s Hyper-Cinematic Storyboard</title>
+    <style>
+        :root {
+            --gold: #d4a24a;
+            --amber: #f4b63a;
+            --dust: #e9d7a3;
+            --earth: #2b1d10;
+            --ink: #0a0603;
+            --shadow: rgba(0, 0, 0, 0.55);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html, body {
+            background: radial-gradient(ellipse at top, #1a1008 0%, var(--ink) 70%);
+            color: var(--dust);
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.5;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .grain::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(rgba(255, 200, 120, 0.04) 1px, transparent 1px);
+            background-size: 3px 3px;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        header {
+            padding: 80px 24px 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            width: 120px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            transform: translateX(-50%);
+        }
+
+        .eyebrow {
+            font-size: 12px;
+            letter-spacing: 6px;
+            color: var(--gold);
+            text-transform: uppercase;
+            margin-bottom: 18px;
+        }
+
+        h1 {
+            font-size: clamp(36px, 7vw, 84px);
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            color: #fff;
+            text-shadow: 0 0 40px rgba(212, 162, 74, 0.25);
+            line-height: 0.95;
+        }
+
+        h1 span {
+            color: var(--amber);
+            font-style: italic;
+        }
+
+        .meta {
+            margin-top: 22px;
+            font-size: 13px;
+            color: rgba(233, 215, 163, 0.55);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        main {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 40px 24px 120px;
+        }
+
+        .block {
+            background: linear-gradient(180deg, rgba(40, 26, 12, 0.6), rgba(15, 9, 4, 0.85));
+            border: 1px solid rgba(212, 162, 74, 0.15);
+            border-radius: 6px;
+            padding: 28px 32px;
+            margin-bottom: 40px;
+            box-shadow: 0 20px 60px var(--shadow);
+        }
+
+        .block h2 {
+            color: var(--amber);
+            font-size: 11px;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            margin-bottom: 18px;
+            border-bottom: 1px solid rgba(212, 162, 74, 0.2);
+            padding-bottom: 12px;
+        }
+
+        .spec-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+        }
+
+        .spec-grid div {
+            font-size: 14px;
+        }
+
+        .spec-grid strong {
+            display: block;
+            color: var(--gold);
+            font-size: 10px;
+            letter-spacing: 3px;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .subject p {
+            font-size: 15px;
+            color: rgba(233, 215, 163, 0.85);
+        }
+
+        .shot {
+            display: grid;
+            grid-template-columns: 110px 1fr;
+            gap: 24px;
+            padding: 26px 0;
+            border-bottom: 1px solid rgba(212, 162, 74, 0.08);
+            position: relative;
+        }
+
+        .shot:last-child { border-bottom: none; }
+
+        .shot .time {
+            font-family: 'Courier New', monospace;
+            color: var(--amber);
+            font-weight: 700;
+            font-size: 15px;
+            letter-spacing: 1px;
+            padding-top: 4px;
+        }
+
+        .shot .time small {
+            display: block;
+            color: rgba(212, 162, 74, 0.5);
+            font-size: 10px;
+            letter-spacing: 2px;
+            margin-top: 4px;
+            font-weight: 400;
+        }
+
+        .shot .tag {
+            display: inline-block;
+            font-size: 10px;
+            letter-spacing: 3px;
+            color: var(--ink);
+            background: var(--amber);
+            padding: 3px 9px;
+            border-radius: 2px;
+            margin-bottom: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .shot p {
+            color: rgba(233, 215, 163, 0.88);
+            font-size: 14.5px;
+        }
+
+        .audio-bar {
+            display: grid;
+            grid-template-columns: 80px 1fr;
+            gap: 16px;
+            padding: 10px 0;
+            font-size: 13.5px;
+            align-items: start;
+        }
+
+        .audio-bar .t {
+            font-family: 'Courier New', monospace;
+            color: var(--gold);
+            font-size: 12px;
+        }
+
+        .audio-bar .d {
+            color: rgba(233, 215, 163, 0.85);
+        }
+
+        footer {
+            text-align: center;
+            color: rgba(233, 215, 163, 0.3);
+            font-size: 11px;
+            letter-spacing: 3px;
+            padding: 40px 20px 60px;
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 600px) {
+            .shot { grid-template-columns: 1fr; gap: 8px; }
+            .shot .time { padding-top: 0; }
+        }
+    </style>
+</head>
+<body class="grain">
+    <header>
+        <div class="eyebrow">Netflix Original · 15 sec teaser</div>
+        <h1>Coiled <span>Lightning</span></h1>
+        <div class="meta">Golden Hour · Savanna Enrichment Run · 2026</div>
+    </header>
+
+    <main>
+        <section class="block">
+            <h2>Production Specifications</h2>
+            <div class="spec-grid">
+                <div><strong>Runtime</strong>15 seconds</div>
+                <div><strong>Cameras</strong>ARRI Alexa 35 · RED V-Raptor</div>
+                <div><strong>Optics</strong>Anamorphic prime lenses</div>
+                <div><strong>Color</strong>REDcolor4, vivid saturation</div>
+                <div><strong>Location</strong>Zoo enrichment yard, golden hour</div>
+                <div><strong>Tone</strong>Michael Bay meets Planet Earth</div>
+            </div>
+        </section>
+
+        <section class="block subject">
+            <h2>Subject</h2>
+            <p>Adult female cheetah. Small rounded head, two sharp black tear marks running from the inner eyes to the mouth. Solid round black spots on golden-tan fur. Narrow waist, deep chest, long thin legs. Amber-brown eyes.</p>
+        </section>
+
+        <section class="block">
+            <h2>Shot Sequence</h2>
+
+            <div class="shot">
+                <div class="time">0.0 – 1.0<small>01 / 10</small></div>
+                <div>
+                    <span class="tag">Top-Down Drone</span>
+                    <p>Straight down at 90°. Cheetah lies still in golden grass like a coiled spring. Camera descends rapidly toward her. Grass sways. Shadow grows across her back. Snap zoom on the final frame.</p>
+                </div>
+            </div>
+
+            <div class="shot">
+                <div class="time">1.0 – 2.0<small>02 / 10</small></div>
+                <div>
+                    <span class="tag">Extreme Macro Eye</span>
+                    <p>Whip pan into an extreme macro of the amber eye. Warp-speed dolly-in. Pupil dilates like a gunshot. Reflection of the lure bag races across the iris. Lens flare slashes the frame. Hard bass hit.</p>
+                </div>
+            </div>
+
+            <div class="shot">
+                <div class="time">2.0 – 3.0<small>03 / 10</small></div>
+                <div>
+                    <span class="tag">Dutch Ground · 240fps</span>
+                    <p>Ground shot tilted 30°, six inches off red earth. Hind legs coil in extreme slow-motion. Every muscle fiber twitches. Claws dig in, throwing the first dust clods. Heartbeat frozen.</p>
+                </div>
+            </div>
+
+            <div class="shot">
+                <div class="time">3.0 – 4.0<small>04 / 10</small></div>
+                <div>
+                    <span class="tag">Bullet-Time 360°</span>
+                    <p>Hard cut to a 360° orbit around the cheetah at the moment of explosive launch. Dust frozen mid-explosion around her paws like a bomb blast. Body uncoiling. Every dirt particle individually lit by the golden sun. Bass drop.</p>
+                </div>
+            </div>
+
+            <div class="shot">
+                <div class="time">4.0 – 6.0<small>05 / 10</small></div>
+                <div>
+                    <span class="tag">Reverse Dolly-Out</span>
+                    <p>Camera tears backward at 50 mph at ground level, trying to escape. Cheetah charges full sprint directly at the lens. Claws throw earth into the camera. Background blur, subject razor sharp. Horizontal anamorphic flares. Wind roar, thunderous paw impacts.</p>
+                </div>
+            </div>
+
+            <div class="shot">
+                <div class="time">6.0 – 8.0<small>06 / 10</small></div>
+                <div>
+                    <span class="tag">Side Parallel · 240fps</span>
+                    <p>Side-tracking parallel shot at full sprint. Spine flexing and extending like a whip. All four paws airborne in full suspension. Golden backlight rims every fur fiber. Muscles rippling in crystal clarity. Dust trail stretches behind like a comet tail. Deep muscle and breath sounds.</p>
+                </div>
+            </div>
+
+            <div class="shot">
+                <div class="time">8.0 – 9.5<small>07 / 10</small></div>
+                <div>
+                    <span class="tag">FPV Drone Chase</span>
+                    <p>Three feet behind the cheetah. Camera weaves and ducks as she sprints. Shoulder blades piston, tail whips for balance, earth explodes under paws. Shaky kinetic energy, GoPro feel.</p>
+                </div>
+            </div>
+
+            <div class="shot">
+                <div class="time">9.5 – 11.0<small>08 / 10</small></div>
+                <div>
+                    <span class="tag">Low Crane Reveal</span>
+                    <p>Starts at paw level, cranes up and over the cheetah as she sprints beneath. The full savanna yard is revealed. Her shadow races across the dirt. Aerial reveal, sun flaring into the lens.</p>
+                </div>
+            </div>
+
+            <div class="shot">
+                <div class="time">11.0 – 12.5<small>09 / 10</small></div>
+                <div>
+                    <span class="tag">Lure-Bag POV</span>
+                    <p>Ground-skimming reverse tracking shot. Cheetah closes from 20 meters to 5 meters in a blink. Jaws part, amber eye locked. Her shadow grows larger across the lens. Camera shakes violently with impact proximity.</p>
+                </div>
+            </div>
+
+            <div class="shot">
+                <div class="time">12.5 – 14.0<small>10 / 10</small></div>
+                <div>
+                    <span class="tag">1000fps Strike</span>
+                    <p>Extreme slow-motion side shot. Moment of paw strike. Lure bag explodes in a dust burst. Dirt and debris suspended around the contact point. Claws extended like blades. A single water droplet of saliva catches the golden light.</p>
+                </div>
+            </div>
+
+            <div class="shot">
+                <div class="time">14.0 – 15.0<small>freeze</small></div>
+                <div>
+                    <span class="tag">Freeze Frame</span>
+                    <p>Hard freeze on her face mid-lunge. Amber eye locked dead center of the lens. Dust particles suspended in air. Muscle twitch. One whisker trembles. Sudden total silence. Frame fractures into black.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="block">
+            <h2>Audio Design</h2>
+            <div class="audio-bar"><div class="t">0.0 – 3.0</div><div class="d">Tribal drum tension build.</div></div>
+            <div class="audio-bar"><div class="t">3.0</div><div class="d">Massive bass drop and sub-boom.</div></div>
+            <div class="audio-bar"><div class="t">3.0 – 11.0</div><div class="d">Continuous wind roar and paw impacts.</div></div>
+            <div class="audio-bar"><div class="t">6.0 – 8.0</div><div class="d">Slow-motion breath and heartbeat layer.</div></div>
+            <div class="audio-bar"><div class="t">11.0 – 13.0</div><div class="d">Rising orchestral swell.</div></div>
+            <div class="audio-bar"><div class="t">14.0 – 15.0</div><div class="d">Single bass hit on freeze frame, then hard silence.</div></div>
+        </section>
+    </main>
+
+    <footer>End of teaser · 15:00</footer>
+</body>
+</html>
