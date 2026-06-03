@@ -29,37 +29,26 @@ bash core/media/generate-video.sh -p "ocean waves at golden hour" -m minimax-pro
 
 ## Using these skills with Gemini Omni
 
-> ⚠️ Gemini Omni is brand-new (MuAPI, 2026) and is **not yet in the bundled
-> `schema_data.json`** (the only "omni" entry here is `midjourney-v7-omni-reference`).
-> The 5 Gemini Omni endpoints are: `gemini-omni-text-to-video`, `gemini-omni-image-to-video`,
-> `gemini-omni-video-edit`, plus the free `gemini-omni-audio` (voice profile) and
-> `gemini-omni-character` (character profile). See `../gemini-omni-skills.md` for full params.
-
-Two ways to drive Omni:
-
-**A) Call the endpoint directly** (no schema entry needed):
+There's a **dedicated, ready-to-run Gemini Omni skill** in
+[`library/motion/gemini-omni/`](library/motion/gemini-omni/SKILL.md) — it wraps all 5 Omni
+endpoints (`gemini-omni-text-to-video`, `-image-to-video`, `-video-edit`, plus the free
+`-audio` voice profile and `-character` profile) behind one dispatcher with local-file upload,
+voice/character IDs, submit-poll, `--view/--async/--json`.
 
 ```bash
-curl -s -X POST "https://api.muapi.ai/api/v1/gemini-omni-text-to-video" \
-  -H "x-api-key: $MUAPI_KEY" -H "Content-Type: application/json" \
-  -d '{"prompt":"A Tokyo night market, neon on wet pavement, ambient chatter","duration":8,"resolution":"1080p","aspect_ratio":"16:9"}'
-# → returns {"request_id": "..."} ; then poll:
-bash core/platform/check-result.sh <request_id>
+# text-to-video with native synchronized audio
+bash library/motion/gemini-omni/scripts/generate-omni.sh --mode t2v \
+  --prompt "A Tokyo night market, neon on wet pavement, ambient chatter and sizzling broth." \
+  --duration 8 --resolution 1080p --aspect-ratio 16:9 --view
 ```
 
-**B) Register Omni in `schema_data.json`** so `generate-video.sh -m gemini-omni-text-to-video`
-works. Add an entry like:
+See its [`SKILL.md`](library/motion/gemini-omni/SKILL.md) for the full character-consistent
+workflow (voice → character → video) and prompting guide, and `../gemini-omni-skills.md` for
+the raw endpoint/parameter reference.
 
-```json
-{
-  "name": "gemini-omni-text-to-video",
-  "input_schema": { "schemas": { "input_data": {
-    "endpoint_url": "gemini-omni-text-to-video",
-    "properties": { "prompt": {}, "duration": {}, "resolution": {}, "aspect_ratio": {},
-                    "audio_ids": {}, "character_ids": {}, "seed": {} }
-  }}}
-}
-```
+> ⚠️ Gemini Omni is newer than the bundled `schema_data.json` (the only "omni" entry there is
+> `midjourney-v7-omni-reference`), so the Omni skill calls the endpoints **directly** rather
+> than resolving them through the schema.
 
 ---
 
