@@ -3,42 +3,35 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Gemini Omni Studio — MuAPI Dashboard</title>
+<title>NOVA — Content Studio</title>
 <style>
   :root{
-    --bg:#0b0d12; --panel:#141821; --panel2:#1b212d; --line:#262d3a;
-    --txt:#e6e9ef; --muted:#8b94a7; --accent:#6c8cff; --accent2:#9a6cff;
-    --ok:#37d399; --warn:#ffb454; --err:#ff5d6c; --chip:#222a38;
-    --radius:14px;
+    --bg:#0a0b10; --panel:#13151d; --panel2:#1a1d27; --line:#252a36;
+    --txt:#e9ecf3; --muted:#8a92a6; --accent:#7c5cff; --accent2:#19c3ff;
+    --ok:#36d39a; --warn:#ffb454; --err:#ff5d6c; --chip:#222837; --radius:16px;
   }
   *{box-sizing:border-box}
   body{margin:0;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    background:radial-gradient(1200px 600px at 80% -10%,#16203a 0%,var(--bg) 55%);color:var(--txt);min-height:100vh}
-  a{color:var(--accent)}
-  .app{display:grid;grid-template-columns:248px 1fr;min-height:100vh}
-  /* Sidebar */
-  .side{background:var(--panel);border-right:1px solid var(--line);padding:18px 14px;position:sticky;top:0;height:100vh;overflow:auto}
-  .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;margin:4px 6px 18px}
-  .brand .logo{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-size:16px}
-  .navlabel{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:14px 8px 6px}
+    background:radial-gradient(1100px 560px at 85% -12%,#1d1740 0%,var(--bg) 55%);color:var(--txt);min-height:100vh}
+  a{color:var(--accent2)}
+  .app{display:grid;grid-template-columns:252px 1fr;min-height:100vh}
+  .side{background:linear-gradient(180deg,#15131f,#101119);border-right:1px solid var(--line);padding:18px 14px;position:sticky;top:0;height:100vh;overflow:auto}
+  .brand{display:flex;align-items:center;gap:11px;margin:4px 6px 4px;font-weight:800;font-size:19px;letter-spacing:.5px}
+  .brand .logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-size:18px;box-shadow:0 6px 20px -6px var(--accent)}
+  .brand small{display:block;font-size:10.5px;font-weight:600;color:var(--muted);letter-spacing:2px;text-transform:uppercase}
+  .navlabel{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:16px 8px 6px}
   .nav{display:flex;flex-direction:column;gap:3px}
-  .nav button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:none;color:var(--muted);
-    padding:9px 10px;border-radius:10px;cursor:pointer;font-size:14px}
+  .nav button{display:flex;align-items:center;gap:11px;width:100%;text-align:left;background:none;border:none;color:var(--muted);padding:9px 10px;border-radius:11px;cursor:pointer;font-size:13.5px}
   .nav button:hover{background:var(--panel2);color:var(--txt)}
-  .nav button.active{background:linear-gradient(90deg,rgba(108,140,255,.18),rgba(154,108,255,.10));color:#fff}
-  .nav button .ic{width:20px;text-align:center}
+  .nav button.active{background:linear-gradient(90deg,rgba(124,92,255,.22),rgba(25,195,255,.08));color:#fff}
+  .nav button .ic{width:20px;text-align:center;font-size:15px}
   .nav button .badge{margin-left:auto;font-size:10px;background:var(--chip);color:var(--muted);padding:2px 7px;border-radius:20px}
   .status{margin:16px 6px 0;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:7px}
-  .dot{width:9px;height:9px;border-radius:50%;background:var(--err)}
-  .dot.on{background:var(--ok)}
-  /* Main */
-  .main{padding:26px 30px 60px;max-width:1100px}
-  .head{margin-bottom:20px}
-  .head h1{margin:0 0 4px;font-size:24px}
-  .head p{margin:0;color:var(--muted);font-size:14px}
-  .workflow{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 22px}
-  .step{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);
-    padding:8px 12px;border-radius:30px;font-size:12.5px;color:var(--muted)}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--err)} .dot.on{background:var(--ok)}
+  .main{padding:26px 32px 64px;max-width:1160px}
+  .head{margin-bottom:14px} .head h1{margin:0 0 4px;font-size:24px} .head p{margin:0;color:var(--muted);font-size:14px;max-width:760px}
+  .workflow{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 20px}
+  .step{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);padding:8px 12px;border-radius:30px;font-size:12.5px;color:var(--muted)}
   .step b{color:var(--txt);font-weight:600}
   .step .n{width:18px;height:18px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:11px;font-weight:700}
   .grid{display:grid;grid-template-columns:1fr 360px;gap:22px;align-items:start}
@@ -49,488 +42,283 @@
   .field label{display:block;font-size:13px;margin-bottom:6px;color:var(--txt)}
   .field .hint{font-size:11.5px;color:var(--muted);margin-top:5px}
   .req{color:var(--err)}
-  input[type=text],input[type=number],textarea,select{width:100%;background:var(--panel2);border:1px solid var(--line);
-    color:var(--txt);border-radius:10px;padding:10px 12px;font-size:14px;font-family:inherit}
-  textarea{min-height:96px;resize:vertical;line-height:1.5}
+  input[type=text],input[type=number],textarea,select{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:10px 12px;font-size:14px;font-family:inherit}
+  textarea{min-height:84px;resize:vertical;line-height:1.5}
   input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent)}
   .row{display:flex;gap:12px}.row>*{flex:1}
   .seg{display:flex;gap:6px;flex-wrap:wrap}
-  .seg button{background:var(--panel2);border:1px solid var(--line);color:var(--muted);padding:8px 14px;border-radius:9px;cursor:pointer;font-size:13px}
+  .seg button{background:var(--panel2);border:1px solid var(--line);color:var(--muted);padding:7px 13px;border-radius:9px;cursor:pointer;font-size:13px}
   .seg button.sel{background:var(--accent);border-color:var(--accent);color:#fff}
-  .drop{border:1.5px dashed var(--line);border-radius:12px;padding:18px;text-align:center;color:var(--muted);cursor:pointer;font-size:13px;background:var(--panel2)}
-  .drop.over{border-color:var(--accent);color:var(--txt)}
-  .thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-  .thumb{position:relative;width:64px;height:64px;border-radius:9px;overflow:hidden;border:1px solid var(--line);background:#000}
+  .tabs{display:flex;gap:8px;margin-bottom:16px}
+  .tabs button{background:var(--panel2);border:1px solid var(--line);color:var(--muted);padding:9px 16px;border-radius:10px;cursor:pointer;font-size:13.5px;font-weight:600}
+  .tabs button.sel{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent;color:#fff}
+  .uprow{display:flex;gap:8px}.uprow input{flex:1}.upbtn{white-space:nowrap}
+  .toggle{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--muted)}
+  .thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .thumb{position:relative;width:60px;height:60px;border-radius:9px;overflow:hidden;border:1px solid var(--line);background:#000}
   .thumb img,.thumb video{width:100%;height:100%;object-fit:cover}
   .thumb .x{position:absolute;top:2px;right:2px;background:rgba(0,0,0,.65);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:11px;width:18px;height:18px}
-  .picker{display:flex;flex-direction:column;gap:6px;max-height:160px;overflow:auto}
+  .picker{display:flex;flex-direction:column;gap:6px;max-height:150px;overflow:auto}
   .pick{display:flex;align-items:center;gap:9px;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:8px 10px;font-size:13px;cursor:pointer}
-  .pick.sel{border-color:var(--accent)}
-  .pick .id{margin-left:auto;font-size:10.5px;color:var(--muted);font-family:ui-monospace,monospace}
+  .pick.sel{border-color:var(--accent)} .pick .id{margin-left:auto;font-size:10.5px;color:var(--muted);font-family:ui-monospace,monospace}
   .empty{color:var(--muted);font-size:12.5px;font-style:italic}
-  .btn{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff;padding:12px 18px;border-radius:11px;
-    font-size:14px;font-weight:600;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:8px}
-  .btn:disabled{opacity:.5;cursor:not-allowed}
-  .btn.ghost{background:var(--panel2);border:1px solid var(--line)}
+  .btn{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff;padding:12px 18px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:8px}
+  .btn:disabled{opacity:.5;cursor:not-allowed} .btn.ghost{background:var(--panel2);border:1px solid var(--line)}
   .out{min-height:120px;display:grid;place-items:center;text-align:center;color:var(--muted);font-size:13px}
-  .out video,.out img{max-width:100%;border-radius:10px}
+  .out video,.out img{max-width:100%;border-radius:10px}.out audio{width:100%}
   .pill{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;padding:4px 10px;border-radius:20px;background:var(--chip);color:var(--muted)}
   .pill.run{color:var(--warn)} .pill.ok{color:var(--ok)} .pill.err{color:var(--err)}
-  .price{font-size:12px;color:var(--muted);margin-top:8px;text-align:center}
+  .price{font-size:12px;color:var(--muted);margin-top:8px;text-align:center;word-break:break-word}
+  .modeldesc{font-size:12.5px;color:var(--muted);margin:8px 0 4px;line-height:1.5}
+  .platforms{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:6px}
+  .plat{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:11px;cursor:pointer;text-align:center;font-size:12.5px}
+  .plat.sel{border-color:var(--accent);background:linear-gradient(135deg,rgba(124,92,255,.18),rgba(25,195,255,.08))}
+  .plat .e{font-size:19px;display:block;margin-bottom:3px} .plat small{color:var(--muted);display:block;font-size:10.5px}
   .libitem{display:flex;align-items:center;gap:10px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px}
   .libitem img{width:40px;height:40px;border-radius:8px;object-fit:cover}
-  .libitem .meta{min-width:0}
-  .libitem .meta b{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .libitem .meta{min-width:0}.libitem .meta b{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .libitem .meta small{color:var(--muted);font-family:ui-monospace,monospace;font-size:10.5px}
   .libitem .copy{margin-left:auto;background:none;border:1px solid var(--line);color:var(--muted);border-radius:7px;cursor:pointer;padding:5px 9px;font-size:11px}
-  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--panel2);border:1px solid var(--line);
-    color:var(--txt);padding:11px 18px;border-radius:11px;font-size:13px;opacity:0;transition:.25s;pointer-events:none;z-index:50}
-  .toast.show{opacity:1}
-  .toast.err{border-color:var(--err)} .toast.ok{border-color:var(--ok)}
-  .note{background:rgba(255,180,84,.08);border:1px solid rgba(255,180,84,.3);color:#ffd9a8;font-size:12.5px;padding:11px 13px;border-radius:10px;margin-bottom:18px}
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--panel2);border:1px solid var(--line);color:var(--txt);padding:11px 18px;border-radius:11px;font-size:13px;opacity:0;transition:.25s;pointer-events:none;z-index:50}
+  .toast.show{opacity:1}.toast.err{border-color:var(--err)}.toast.ok{border-color:var(--ok)}
+  .note{background:rgba(124,92,255,.08);border:1px solid rgba(124,92,255,.3);color:#cfc4ff;font-size:12.5px;padding:11px 13px;border-radius:10px;margin-bottom:16px}
   code{background:var(--panel2);padding:2px 6px;border-radius:6px;font-size:12px}
-  .hist{font-size:12.5px}
-  .hist .h{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)}
-  .hist .h:last-child{border:none}
-  .hist .h .t{color:var(--muted);margin-left:auto;font-size:11px}
-  kbd{background:var(--panel2);border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:1px 6px;font-size:11px}
+  .hist .h{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);font-size:12.5px}
+  .hist .h:last-child{border:none}.hist .h .t{color:var(--muted);margin-left:auto;font-size:11px}
 </style>
 </head>
 <body>
 <div class="app">
-  <!-- ===== Sidebar ===== -->
   <aside class="side">
-    <div class="brand"><span class="logo">◑</span> Omni Studio</div>
-    <div class="navlabel">Generate</div>
-    <nav class="nav" id="navGen"></nav>
-    <div class="navlabel">Assets</div>
-    <nav class="nav" id="navAssets"></nav>
-    <div class="navlabel">System</div>
-    <nav class="nav" id="navSys"></nav>
-    <div class="status"><span class="dot" id="connDot"></span><span id="connTxt">No API key</span></div>
+    <div class="brand"><span class="logo" id="brandMark">✦</span><span id="brandName">NOVA<small id="brandSub">Content Studio</small></span></div>
+    <div class="navlabel">Create</div><nav class="nav" id="navCreate"></nav>
+    <div class="navlabel">Power</div><nav class="nav" id="navPower"></nav>
+    <div class="navlabel">Assets</div><nav class="nav" id="navAssets"></nav>
+    <div class="navlabel">System</div><nav class="nav" id="navSys"></nav>
+    <div class="status"><span class="dot" id="connDot"></span><span id="connTxt">Not connected</span></div>
   </aside>
-
-  <!-- ===== Main ===== -->
   <main class="main" id="view"></main>
 </div>
 <div class="toast" id="toast"></div>
 
 <script>
-/* ============================================================
-   Gemini Omni Studio — single-file dashboard for MuAPI
-   Works once you set your API key (Settings). Calls muapi
-   directly: POST endpoint -> request_id -> poll result.
-   ============================================================ */
+/* ===== BRAND — change these 3 lines to rename your product ===== */
+const BRAND={name:'NOVA', sub:'Content Studio', mark:'✦'};
 
-const LS = {
-  get key(){return localStorage.getItem('omni_key')||''},
-  set key(v){localStorage.setItem('omni_key',v)},
-  get base(){return localStorage.getItem('omni_base')||'https://api.muapi.ai/api/v1'},
-  set base(v){localStorage.setItem('omni_base',v)},
-  get lib(){try{return JSON.parse(localStorage.getItem('omni_lib')||'{"voices":[],"characters":[]}')}catch(e){return{voices:[],characters:[]}}},
-  set lib(v){localStorage.setItem('omni_lib',JSON.stringify(v))},
-  get hist(){try{return JSON.parse(localStorage.getItem('omni_hist')||'[]')}catch(e){return[]}},
-  set hist(v){localStorage.setItem('omni_hist',JSON.stringify(v.slice(0,40)))}
+/* ===== storage ===== */
+const LS={
+  get key(){return localStorage.getItem('nova_key')||''}, set key(v){localStorage.setItem('nova_key',v)},
+  get base(){return localStorage.getItem('nova_base')||'https://api.muapi.ai/api/v1'}, set base(v){localStorage.setItem('nova_base',v)},
+  get lib(){try{return JSON.parse(localStorage.getItem('nova_lib')||'{"voices":[],"characters":[]}')}catch(e){return{voices:[],characters:[]}}}, set lib(v){localStorage.setItem('nova_lib',JSON.stringify(v))},
+  get hist(){try{return JSON.parse(localStorage.getItem('nova_hist')||'[]')}catch(e){return[]}}, set hist(v){localStorage.setItem('nova_hist',JSON.stringify(v.slice(0,60)))}
+};
+const VOICES=["achernar","achird","algenib","algieba","alnilam","aoede","autonoe","callirrhoe","charon","despina","enceladus","erinome","fenrir","gacrux","iapetus","korel","aomedeia","leda","orus","puck","pulcherrima","rasalgethi","sadachbia","sadaltager","schedar","sulafat","umbriel","vindemiatrix","zephyr","zubenelgenubi"];
+const PLATFORMS={
+  tiktok:{e:'🎵',label:'TikTok',ar:'9:16',dur:8,kind:'video'},
+  reels:{e:'📸',label:'Reels',ar:'9:16',dur:8,kind:'video'},
+  shorts:{e:'▶️',label:'YT Shorts',ar:'9:16',dur:8,kind:'video'},
+  igpost:{e:'🟪',label:'IG Post',ar:'1:1',dur:0,kind:'image'},
+  youtube:{e:'🎬',label:'YouTube',ar:'16:9',dur:8,kind:'video'},
+  x:{e:'✖️',label:'X / Twitter',ar:'16:9',dur:6,kind:'video'}
 };
 
-const VOICES = ["achernar","achird","algenib","algieba","alnilam","aoede","autonoe","callirrhoe","charon","despina","enceladus","erinome","fenrir","gacrux","iapetus","korel","aomedeia","leda","orus","puck","pulcherrima","rasalgethi","sadachbia","sadaltager","schedar","sulafat","umbriel","vindemiatrix","zephyr","zubenelgenubi"];
+let MODELS=[], MODELS_BY_CAT={};
 
-/* ---- Skill / workflow definitions (the "thinking", encoded) ---- */
-const SKILLS = {
-  t2v:{
-    nav:'Text → Video', icon:'🎬', badge:'$1.50+',
-    title:'Text to Video', endpoint:'gemini-omni-text-to-video', output:'video',
-    desc:'One prompt → cinematic video with synchronized dialogue, ambient sound and music in a single pass.',
-    workflow:[['Write a rich prompt','visuals + audio together'],['(optional) attach voice / character','for consistency'],['Pick duration / resolution','then Generate'],['Poll until ready','video + audio out']],
-    fields:['prompt','media_opts','assets']
-  },
-  i2v:{
-    nav:'Image → Video', icon:'🖼️', badge:'$1.50+',
-    title:'Image to Video', endpoint:'gemini-omni-image-to-video', output:'video',
-    desc:'Animate 1–5 reference images with a prompt. Subject identity preserved across frames, audio generated natively.',
-    workflow:[['Upload 1–5 reference images','subjects / style'],['Describe the motion & scene','+ audio cues'],['Pick options','then Generate'],['Poll until ready','animated video']],
-    fields:['images','prompt','media_opts','assets']
-  },
-  edit:{
-    nav:'Video Edit', icon:'✂️', badge:'$2.40',
-    title:'Video Edit', endpoint:'gemini-omni-video-edit', output:'video',
-    desc:'Restyle, relight, swap subjects or rewrite dialogue from a source clip — motion & timing preserved.',
-    workflow:[['Upload a source clip','≤100MB / 30s'],['Trim the edit window','≤10s span'],['Describe the edit','what changes / stays'],['Generate & poll','edited video']],
-    fields:['video','trim','prompt','images_opt','media_opts','assets']
-  },
-  audio:{
-    nav:'Voice Profile', icon:'🎙️', badge:'Free',
-    title:'Voice Profile', endpoint:'gemini-omni-audio', output:'voice',
-    desc:'Create a reusable voice from 30 presets. Returns an audio_id you attach to any video for a consistent voice.',
-    workflow:[['Pick a base voice','30 presets'],['Name + describe it','timbre / style'],['Create','→ audio_id saved to Library'],['Reuse','in Text/Image/Edit']],
-    fields:['voiceform']
-  },
-  character:{
-    nav:'Character', icon:'🧑‍🎤', badge:'Free',
-    title:'Character Profile', endpoint:'gemini-omni-character', output:'character',
-    desc:'Create a reusable character from 1 image + a description. Returns a character_id for identity-consistent video.',
-    workflow:[['Upload 1 reference image','the visual anchor'],['Describe the character','+ optional voice'],['Create','→ character_id saved to Library'],['Reuse','via Character picker']],
-    fields:['charform']
-  }
+/* ===== nav config (outcome-oriented; engine hidden) ===== */
+const NAV={
+  create:[
+    ['video','🎬','Make Video'],
+    ['edit','✂️','Edit Video'],
+    ['avatars','🧑‍🎤','Avatars'],
+    ['talking','🗣️','Talking Avatar'],
+    ['social','📣','Social Content'],
+    ['images','🎨','Images'],
+    ['audio','🎵','Audio & Music'],
+  ],
+  power:[['allmodels','🧩','All Engines']],
+  assets:[['library','📚','Library'],['history','🕘','History']],
+  sys:[['settings','⚙️','Settings']]
 };
 
-/* ---------- tiny helpers ---------- */
+/* ===== helpers ===== */
 const $=(s,r=document)=>r.querySelector(s);
-const el=(t,a={},...c)=>{const e=document.createElement(t);for(const k in a){if(k==='class')e.className=a[k];else if(k==='html')e.innerHTML=a[k];else if(k.startsWith('on'))e.addEventListener(k.slice(2),a[k]);else e.setAttribute(k,a[k])}c.flat().forEach(x=>e.append(x.nodeType?x:document.createTextNode(x)));return e};
-const uid=()=>Math.random().toString(36).slice(2,10);
-function toast(msg,type=''){const t=$('#toast');t.textContent=msg;t.className='toast show '+type;setTimeout(()=>t.className='toast',2600);}
+const el=(t,a={},...c)=>{const e=document.createElement(t);for(const k in a){if(k==='class')e.className=a[k];else if(k==='html')e.innerHTML=a[k];else if(k.startsWith('on'))e.addEventListener(k.slice(2),a[k]);else e.setAttribute(k,a[k])}c.flat().forEach(x=>x!=null&&e.append(x.nodeType?x:document.createTextNode(x)));return e};
+function toast(m,t=''){const e=$('#toast');e.textContent=m;e.className='toast show '+t;setTimeout(()=>e.className='toast',2600);}
 function headers(){return{'x-api-key':LS.key,'Content-Type':'application/json'};}
+function pretty(s){return s.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());}
+let F={};
 
-/* ---------- API layer ---------- */
-async function apiUpload(file){
-  const fd=new FormData();fd.append('file',file);
-  const r=await fetch(`${LS.base}/upload_file`,{method:'POST',headers:{'x-api-key':LS.key},body:fd});
-  const j=await r.json().catch(()=>({}));
-  if(!j.url) throw new Error(j.error||j.detail||'Upload failed');
-  return j.url;
-}
-async function apiSubmit(endpoint,payload){
-  const r=await fetch(`${LS.base}/${endpoint}`,{method:'POST',headers:headers(),body:JSON.stringify(payload)});
-  const j=await r.json().catch(()=>({}));
-  if(j.error||j.detail) throw new Error(j.error||j.detail);
-  return j;
-}
-async function apiResult(id){
-  const r=await fetch(`${LS.base}/predictions/${id}/result`,{headers:headers()});
-  return r.json();
-}
-async function poll(id,onTick){
-  for(let i=0;i<180;i++){
-    await new Promise(r=>setTimeout(r,4000));
-    const j=await apiResult(id);
-    onTick&&onTick(j.status||'processing');
-    if(j.status==='completed')return j;
-    if(j.status==='failed')throw new Error((j.output&&j.output.error)||j.error||'failed');
-  }
-  throw new Error('Timed out — re-poll from History');
-}
+/* ===== engine API ===== */
+async function apiUpload(file){const fd=new FormData();fd.append('file',file);const r=await fetch(`${LS.base}/upload_file`,{method:'POST',headers:{'x-api-key':LS.key},body:fd});const j=await r.json().catch(()=>({}));if(!j.url)throw new Error(j.error||j.detail||'Upload failed');return j.url;}
+async function apiSubmit(ep,p){const r=await fetch(`${LS.base}/${ep}`,{method:'POST',headers:headers(),body:JSON.stringify(p)});const j=await r.json().catch(()=>({}));if(j.error||j.detail)throw new Error(j.error||j.detail);return j;}
+async function apiResult(id){const r=await fetch(`${LS.base}/predictions/${id}/result`,{headers:headers()});return r.json();}
+async function poll(id,tick){for(let i=0;i<200;i++){await new Promise(r=>setTimeout(r,4000));const j=await apiResult(id);tick&&tick(j.status||'processing');if(j.status==='completed')return j;if(j.status==='failed')throw new Error((j.output&&j.output.error)||j.error||'failed');}throw new Error('Timed out — re-poll from History');}
 
-/* ---------- state for the active form ---------- */
-let F={}; // current form working values
+/* ===== field renderers ===== */
+function wrap(label,node,hint,req){const f=el('div',{class:'field'});if(label){const l=el('label',{},label);if(req)l.append(el('span',{class:'req'},' *'));f.append(l);}f.append(node);if(hint)f.append(el('div',{class:'hint',html:hint}));return f;}
+function fSeg(label,key,opts,def,hint){F[key]=def;const seg=el('div',{class:'seg'});opts.forEach(o=>{const b=el('button',{class:o===def?'sel':'',onclick:()=>{F[key]=o;[...seg.children].forEach(c=>c.classList.toggle('sel',c.textContent===String(o)));}},String(o));seg.append(b);});return wrap(label,seg,hint,false);}
+function fText(label,key,ph,req,area){const n=area?el('textarea',{placeholder:ph||''}):el('input',{type:'text',placeholder:ph||''});n.addEventListener('input',()=>F[key]=n.value);F[key]='';return wrap(label,n,null,req);}
+function fSelect(label,key,opts,req){const s=el('select');s.append(el('option',{value:''},'— choose —'));opts.forEach(o=>s.append(el('option',{value:o},o)));s.addEventListener('change',()=>F[key]=s.value);return wrap(label,s,null,req);}
+function fFiles(label,key,multi,hint,accept){F[key]=[];const drop=el('div',{class:'seg'});const btn=el('button',{},multi?'+ add files':'choose file');const thumbs=el('div',{class:'thumbs'});const input=el('input',{type:'file',accept:accept||'image/*',style:'display:none',...(multi?{multiple:'multiple'}:{})});
+  const add=fl=>{for(const f of fl){if(!multi){F[key]=[];thumbs.innerHTML='';}F[key].push({file:f});const url=URL.createObjectURL(f);const isV=f.type.startsWith('video');const t=el('div',{class:'thumb'},isV?el('video',{src:url,muted:'1'}):el('img',{src:url}));const rec=F[key][F[key].length-1];t.append(el('button',{class:'x',onclick:()=>{F[key]=F[key].filter(r=>r!==rec);t.remove();}},'×'));thumbs.append(t);if(!multi)break;}};
+  btn.onclick=e=>{e.preventDefault();input.click();};input.onchange=()=>add(input.files);drop.append(btn);return wrap(label,el('div',{},drop,input,thumbs),hint,!hint&&!multi);}
+function fUrl(label,key,accept,req,hint){F[key]='';const inp=el('input',{type:'text',placeholder:'paste URL or upload →'});inp.oninput=()=>F[key]=inp.value;const file=el('input',{type:'file',accept:accept||'image/*',style:'display:none'});const up=el('button',{class:'upbtn',onclick:async e=>{e.preventDefault();if(!LS.key)return toast('Connect in Settings first','err');file.click();}},'⬆ upload');file.onchange=async()=>{try{up.textContent='…';const u=await apiUpload(file.files[0]);inp.value=u;F[key]=u;up.textContent='✓';toast('Uploaded','ok');}catch(e){up.textContent='⬆ upload';toast(e.message,'err');}};return wrap(label,el('div',{class:'uprow'},inp,el('div',{class:'seg'},up),file),hint,req);}
 
-/* ---------- field renderers ---------- */
-function fSeg(label,key,opts,def,hint){
-  F[key]=def;
-  const seg=el('div',{class:'seg'});
-  opts.forEach(o=>{const b=el('button',{class:o===def?'sel':'',onclick:()=>{F[key]=o;[...seg.children].forEach(c=>c.classList.toggle('sel',c.textContent===String(o)));}},String(o));seg.append(b);});
-  return wrap(label,seg,hint,false);
-}
-function wrap(label,node,hint,req){
-  const f=el('div',{class:'field'});
-  if(label){const l=el('label',{},label);if(req)l.append(el('span',{class:'req'},' *'));f.append(l);}
-  f.append(node);if(hint)f.append(el('div',{class:'hint',html:hint}));return f;
-}
-function fText(label,key,ph,req,area){
-  const n=area?el('textarea',{placeholder:ph}):el('input',{type:'text',placeholder:ph});
-  n.addEventListener('input',()=>F[key]=n.value);F[key]='';
-  return wrap(label,n,null,req);
-}
-function fNum(label,key,ph){const n=el('input',{type:'number',placeholder:ph||''});n.addEventListener('input',()=>F[key]=n.value);return wrap(label,n);}
-function fSelect(label,key,opts,req){
-  const s=el('select');s.append(el('option',{value:''},'— choose —'));
-  opts.forEach(o=>s.append(el('option',{value:o},o)));
-  s.addEventListener('change',()=>F[key]=s.value);return wrap(label,s,null,req);
-}
-/* file uploader (returns CDN urls on generate; previews locally) */
-function fFiles(label,key,multi,hint,accept){
-  F[key]=[]; // array of {file,url}
-  const drop=el('div',{class:'drop'},multi?'Drag & drop or click — images':'Click to choose');
-  const thumbs=el('div',{class:'thumbs'});
-  const input=el('input',{type:'file',accept:accept||'image/*',style:'display:none',...(multi?{multiple:'multiple'}:{})});
-  const add=files=>{for(const f of files){if(!multi)F[key]=[];F[key].push({file:f});if(!multi)thumbs.innerHTML='';
-      const url=URL.createObjectURL(f);const isV=f.type.startsWith('video');
-      const t=el('div',{class:'thumb'}, isV?el('video',{src:url,muted:'1'}):el('img',{src:url}));
-      const rec=F[key][F[key].length-1];
-      t.append(el('button',{class:'x',onclick:()=>{F[key]=F[key].filter(r=>r!==rec);t.remove();}},'×'));
-      thumbs.append(t);if(!multi)break;}};
-  drop.onclick=()=>input.click();
-  input.onchange=()=>add(input.files);
-  drop.ondragover=e=>{e.preventDefault();drop.classList.add('over')};
-  drop.ondragleave=()=>drop.classList.remove('over');
-  drop.ondrop=e=>{e.preventDefault();drop.classList.remove('over');add(e.dataTransfer.files);};
-  return wrap(label,el('div',{},drop,input,thumbs),hint,!hint);
-}
-/* asset pickers (voices + characters from Library) */
-function fAssets(){
-  const box=el('div',{});
-  F.audio_ids=[];F.character_ids=[];
-  box.append(picker('Voice profiles','voices','audio_ids','audioId',3));
-  box.append(picker('Characters','characters','character_ids','charId',3));
-  return box;
-}
-function picker(label,libKey,fKey,idField,max){
-  const lib=LS.lib[libKey]||[];
-  const wrapEl=el('div',{class:'field'});
-  wrapEl.append(el('label',{},`${label} `,el('span',{class:'hint',html:`(max ${max})`})));
-  if(!lib.length){wrapEl.append(el('div',{class:'empty'},`None yet — create in the ${libKey==='voices'?'Voice Profile':'Character'} tab.`));return wrapEl;}
-  const list=el('div',{class:'picker'});
-  lib.forEach(it=>{
-    const row=el('div',{class:'pick'});
-    const cb=el('input',{type:'checkbox'});
-    cb.onchange=()=>{if(cb.checked){if(F[fKey].length>=max){cb.checked=false;toast('Max '+max);return;}F[fKey].push(it[idField]);row.classList.add('sel');}else{F[fKey]=F[fKey].filter(x=>x!==it[idField]);row.classList.remove('sel');}};
-    row.append(cb, it.thumb?el('img',{src:it.thumb,style:'width:26px;height:26px;border-radius:6px;object-fit:cover'}):document.createTextNode(libKey==='voices'?'🎙️':'🧑'), el('span',{},it.name||'(unnamed)'), el('span',{class:'id'},it[idField]||''));
-    list.append(row);
-  });
-  wrapEl.append(list);return wrapEl;
-}
+/* ===== nav / routing ===== */
+let CURRENT='video';
+function go(id){CURRENT=id;window.scrollTo(0,0);renderNav();const v=$('#view');v.innerHTML='';
+  ({video:viewVideo,edit:viewEdit,avatars:viewAvatars,talking:viewTalking,social:viewSocial,images:viewImages,audio:viewAudio,allmodels:viewAll,library:viewLibrary,history:viewHistory,settings:viewSettings}[id]||viewVideo)(v);}
+function navGroup(elm,items){elm.innerHTML='';items.forEach(([id,ic,label])=>{let badge='';if(id==='library'){const l=LS.lib;badge=String((l.voices.length+l.characters.length)||'');}if(id==='history')badge=String(LS.hist.length||'');if(id==='allmodels')badge=String(MODELS.length||'');elm.append(el('button',{class:id===CURRENT?'active':'',onclick:()=>go(id)},el('span',{class:'ic'},ic),el('span',{},label),badge?el('span',{class:'badge'},badge):null));});}
+function renderNav(){navGroup($('#navCreate'),NAV.create);navGroup($('#navPower'),NAV.power);navGroup($('#navAssets'),NAV.assets);navGroup($('#navSys'),NAV.sys);
+  const ok=!!LS.key;$('#connDot').className='dot'+(ok?' on':'');$('#connTxt').textContent=ok?'Connected':'Not connected';
+  $('#brandName').firstChild.textContent=BRAND.name;$('#brandSub').textContent=BRAND.sub;$('#brandMark').textContent=BRAND.mark;document.title=BRAND.name+' — '+BRAND.sub;}
+function header(t,d){return el('div',{class:'head'},el('h1',{},t),el('p',{},d));}
+function workflowBar(steps){const w=el('div',{class:'workflow'});steps.forEach((s,i)=>w.append(el('div',{class:'step'},el('span',{class:'n'},String(i+1)),el('b',{},s[0]),'· '+s[1])));return w;}
+function keyNote(v){if(!LS.key)v.append(el('div',{class:'note',html:'Not connected yet — add your engine key in <b>Settings</b> to generate. Every form already reflects the real workflow.'}));}
+function assetsPanel(){const box=el('div',{});F.audio_ids=[];F.character_ids=[];box.append(picker('Voice','voices','audio_ids','audioId',3));box.append(picker('Character','characters','character_ids','charId',3));return box;}
+function picker(label,libKey,fKey,idField,max){const lib=LS.lib[libKey]||[];const w=el('div',{class:'field'});w.append(el('label',{},`${label} `,el('span',{class:'hint',html:`(max ${max})`})));F[fKey]=F[fKey]||[];if(!lib.length){w.append(el('div',{class:'empty'},`None yet — create in ${libKey==='voices'?'Avatars → Voice':'Avatars'}.`));return w;}const list=el('div',{class:'picker'});lib.forEach(it=>{const row=el('div',{class:'pick'});const cb=el('input',{type:'checkbox'});cb.onchange=()=>{if(cb.checked){if(F[fKey].length>=max){cb.checked=false;return toast('Max '+max);}F[fKey].push(it[idField]);row.classList.add('sel');}else{F[fKey]=F[fKey].filter(x=>x!==it[idField]);row.classList.remove('sel');}};row.append(cb,it.thumb?el('img',{src:it.thumb,style:'width:26px;height:26px;border-radius:6px;object-fit:cover'}):document.createTextNode(libKey==='voices'?'🎙️':'🧑'),el('span',{},it.name||'(unnamed)'),el('span',{class:'id'},it[idField]||''));list.append(row);});w.append(list);return w;}
 
-/* ---------- build a generation form for a video skill ---------- */
-function buildFields(skill,col){
-  const f=skill.fields;
-  if(f.includes('images')) col.append(fFiles('Reference images (1–5)','images',true,null));
-  if(f.includes('video')) col.append(fFiles('Source video','video',false,'Max 100MB / 30s. mp4 or mov.','video/*'));
-  if(f.includes('trim')){const r=el('div',{class:'row'});F.trim_start='';F.trim_end='';
-    const a=el('input',{type:'number',placeholder:'start s'});a.oninput=()=>F.trim_start=a.value;
-    const b=el('input',{type:'number',placeholder:'end s'});b.oninput=()=>F.trim_end=b.value;
-    r.append(wrap('Trim start',a),wrap('Trim end',b));col.append(r);}
-  if(f.includes('prompt')) col.append(fText(skill.id==='edit'?'Edit instruction':'Prompt','prompt',
-      skill.id==='edit'?'Restyle as Studio Ghibli; keep camera motion & timing':'Describe scene, action, camera, dialogue and ambient sound…',true,true));
-  if(f.includes('images_opt')) col.append(fFiles('Reference images (optional)','images',true,'Used as visual refs for the edit.'));
-  if(f.includes('media_opts')){
-    col.append(fSeg('Duration (seconds)','duration',[4,6,8,10],8));
-    const r=el('div',{class:'row'});
-    r.append(fSeg('Resolution','resolution',['720p','1080p','4k'],'1080p'));
-    r.append(fSeg('Aspect','aspect_ratio',['16:9','9:16'],'16:9'));
-    col.append(r);
-    col.append(fText('Seed (optional)','seed','Leave empty for random'));
-  }
-}
+/* split layout: left inputs card, right output+button */
+function splitLayout(v,leftBuild,onGen,priceTxt,genLabel){const grid=el('div',{class:'grid'});const left=el('div',{class:'card'});left.append(el('h3',{},'Inputs'));leftBuild(left);
+  const right=el('div',{});const outCard=el('div',{class:'card'});outCard.append(el('h3',{},'Output'));const out=el('div',{class:'out'},'Result appears here');outCard.append(out);const status=el('div',{class:'price'});outCard.append(status);
+  const btn=el('button',{class:'btn',onclick:()=>onGen(out,status,btn)},genLabel||'✨ Generate');const act=el('div',{class:'card'});act.append(btn);if(priceTxt)act.append(el('div',{class:'price'},priceTxt));
+  right.append(act,outCard);grid.append(left,right);v.append(grid);return{out,status,btn};}
+function renderMedia(out,res,kind){const url=(res.outputs&&res.outputs[0])||res.url||'';const u=String(url).toLowerCase();if(/\.(mp4|mov|webm)(\?|$)/.test(u))kind='video';else if(/\.(png|jpe?g|webp|gif)(\?|$)/.test(u))kind='image';else if(/\.(mp3|wav|m4a|ogg|flac)(\?|$)/.test(u))kind='audio';
+  out.innerHTML='';if(!url){out.append(el('div',{},'No media in response.'),el('pre',{style:'font-size:11px;text-align:left;overflow:auto;max-height:160px'},JSON.stringify(res).slice(0,1000)));return;}
+  if(kind==='image')out.append(el('img',{src:url}));else if(kind==='audio')out.append(el('audio',{src:url,controls:'1'}));else out.append(el('video',{src:url,controls:'1',autoplay:'1',loop:'1',muted:'1'}));
+  out.append(el('div',{class:'price'},el('a',{href:url,target:'_blank'},'⬇ open / download')));}
+async function runJob(endpoint,payload,name,out,status,btn,kind){if(!LS.key)return toast('Connect in Settings','err');
+  try{btn.disabled=true;out.innerHTML='';status.innerHTML='<span class="pill run">● submitting</span>';const sub=await apiSubmit(endpoint,payload);let res=sub;
+    if(sub.request_id){addHistory({id:sub.request_id,skill:name,t:Date.now(),status:'processing'});res=await poll(sub.request_id,st=>status.innerHTML=`<span class="pill run">● ${st}</span> <code>${sub.request_id}</code>`);updHistory(sub.request_id,'completed');}
+    renderMedia(out,res,kind);status.innerHTML='<span class="pill ok">● completed</span>';toast('Done!','ok');return res;
+  }catch(e){status.innerHTML='<span class="pill err">● '+e.message+'</span>';toast(e.message,'err');}finally{btn.disabled=false;}}
 
-/* ---------- payload builders ---------- */
-async function gatherVideoPayload(skill){
-  const p={prompt:F.prompt||'',duration:Number(F.duration),resolution:F.resolution,aspect_ratio:F.aspect_ratio};
-  if(!p.prompt) throw new Error('Prompt is required');
-  if(F.seed) p.seed=Number(F.seed);
-  if(F.audio_ids&&F.audio_ids.length) p.audio_ids=F.audio_ids;
-  if(F.character_ids&&F.character_ids.length) p.character_ids=F.character_ids;
-  // uploads
-  if(skill.id==='i2v'||skill.id==='edit'){
-    const imgs=(F.images||[]);
-    if(skill.id==='i2v'&&!imgs.length) throw new Error('Add 1–5 reference images');
-    if(imgs.length){p.image_urls=[];for(const it of imgs){p.image_urls.push(it.url||(it.url=await apiUpload(it.file)));}}
-  }
-  if(skill.id==='edit'){
-    const v=(F.video||[])[0];
-    if(v) p.video_url=v.url||(v.url=await apiUpload(v.file));
-    if(!v&&!(p.image_urls&&p.image_urls.length)) throw new Error('Add a source video (or reference images)');
-    if(F.trim_start!=='') p.trim_start=Number(F.trim_start);
-    if(F.trim_end!=='') p.trim_end=Number(F.trim_end);
-  }
-  return p;
-}
+/* ===== CREATE: Make Video (engine: Omni t2v/i2v) ===== */
+function viewVideo(v){F={};v.append(header('Make Video 🎬','Describe a scene — get a finished clip with synchronized voice, ambient sound and music. Add reference images to lock a look or subject.'));keyNote(v);
+  v.append(workflowBar([['Describe scene + sound','one prompt'],['(opt) reference images / avatar','lock look'],['Format & length','then create'],['Render','video + audio']]));
+  splitLayout(v,left=>{left.append(fFiles('Reference images (optional, up to 5)','images',true,'Lock a subject or style — leave empty for pure text-to-video.'));
+    left.append(fText('Prompt','prompt','A street musician plays violin on a rainy Paris evening; raindrops on cobblestones, slow melody, distant café chatter.',true,true));
+    left.append(fSeg('Length (sec)','duration',[4,6,8,10],8));const r=el('div',{class:'row'});r.append(fSeg('Quality','resolution',['720p','1080p','4k'],'1080p'));r.append(fSeg('Format','aspect_ratio',['16:9','9:16'],'16:9'));left.append(r);
+    left.append(fText('Seed (optional)','seed','random'));left.append(assetsPanel());
+  },async(out,status,btn)=>{if(!F.prompt)return toast('Prompt required','err');const imgs=F.images||[];const p={prompt:F.prompt,duration:Number(F.duration),resolution:F.resolution,aspect_ratio:F.aspect_ratio};if(F.seed)p.seed=Number(F.seed);if(F.audio_ids&&F.audio_ids.length)p.audio_ids=F.audio_ids;if(F.character_ids&&F.character_ids.length)p.character_ids=F.character_ids;let ep='gemini-omni-text-to-video';
+    try{if(imgs.length){btn.disabled=true;status.innerHTML='<span class="pill run">● uploading</span>';p.image_urls=[];for(const it of imgs)p.image_urls.push(it.url||(it.url=await apiUpload(it.file)));ep='gemini-omni-image-to-video';}}catch(e){btn.disabled=false;status.innerHTML='';return toast(e.message,'err');}
+    runJob(ep,p,'Make Video',out,status,btn,'video');
+  },'≈ $1.50–$3.00 · voice & sound included','✨ Create video');}
 
-/* ============================================================
-   VIEWS
-   ============================================================ */
-let CURRENT='t2v';
-function go(id){CURRENT=id;renderNav();
-  if(id==='library')return viewLibrary();
-  if(id==='history')return viewHistory();
-  if(id==='settings')return viewSettings();
-  return viewSkill(id);
-}
-function renderNav(){
-  const gen=$('#navGen');gen.innerHTML='';
-  Object.entries(SKILLS).forEach(([id,s])=>{
-    gen.append(el('button',{class:id===CURRENT?'active':'',onclick:()=>go(id)},
-      el('span',{class:'ic'},s.icon),el('span',{},s.nav),el('span',{class:'badge'},s.badge)));
-  });
-  const as=$('#navAssets');as.innerHTML='';
-  const lib=LS.lib;
-  as.append(el('button',{class:CURRENT==='library'?'active':'',onclick:()=>go('library')},
-    el('span',{class:'ic'},'📚'),el('span',{},'Library'),el('span',{class:'badge'},String((lib.voices.length+lib.characters.length)||''))));
-  as.append(el('button',{class:CURRENT==='history'?'active':'',onclick:()=>go('history')},
-    el('span',{class:'ic'},'🕘'),el('span',{},'History'),el('span',{class:'badge'},String(LS.hist.length||''))));
-  const sys=$('#navSys');sys.innerHTML='';
-  sys.append(el('button',{class:CURRENT==='settings'?'active':'',onclick:()=>go('settings')},el('span',{class:'ic'},'⚙️'),el('span',{},'Settings')));
-  // connection
-  const ok=!!LS.key;$('#connDot').className='dot'+(ok?' on':'');$('#connTxt').textContent=ok?'API key set':'No API key';
-}
+/* ===== CREATE: Edit Video (engine: Omni video-edit) ===== */
+function viewEdit(v){F={};v.append(header('Edit Video ✂️','Restyle, relight, swap subjects or rewrite dialogue from a source clip — original motion and timing preserved.'));keyNote(v);
+  v.append(workflowBar([['Upload source clip','≤100MB / 30s'],['Trim window','≤10s'],['Describe the edit','changes / stays'],['Render','edited clip']]));
+  splitLayout(v,left=>{left.append(fFiles('Source video','video',false,'mp4 / mov, ≤100MB / 30s.','video/*'));const r=el('div',{class:'row'});F.trim_start='';F.trim_end='';const a=el('input',{type:'number',placeholder:'start s'});a.oninput=()=>F.trim_start=a.value;const b=el('input',{type:'number',placeholder:'end s'});b.oninput=()=>F.trim_end=b.value;r.append(wrap('Trim start',a),wrap('Trim end',b));left.append(r);
+    left.append(fText('Edit instruction','prompt','Restyle as hand-drawn Studio Ghibli animation; keep camera motion and timing.',true,true));
+    left.append(fFiles('Reference images (optional)','images',true,'Visual refs for the edit.'));const r2=el('div',{class:'row'});r2.append(fSeg('Quality','resolution',['720p','1080p','4k'],'1080p'));r2.append(fSeg('Format','aspect_ratio',['16:9','9:16'],'16:9'));left.append(r2);left.append(assetsPanel());
+  },async(out,status,btn)=>{if(!F.prompt)return toast('Edit instruction required','err');const vd=(F.video||[])[0];const imgs=F.images||[];if(!vd&&!imgs.length)return toast('Add a source video','err');const p={prompt:F.prompt,resolution:F.resolution,aspect_ratio:F.aspect_ratio};
+    try{btn.disabled=true;status.innerHTML='<span class="pill run">● uploading</span>';if(vd)p.video_url=vd.url||(vd.url=await apiUpload(vd.file));if(imgs.length){p.image_urls=[];for(const it of imgs)p.image_urls.push(it.url||(it.url=await apiUpload(it.file)));}}catch(e){btn.disabled=false;status.innerHTML='';return toast(e.message,'err');}
+    if(F.trim_start!=='')p.trim_start=Number(F.trim_start);if(F.trim_end!=='')p.trim_end=Number(F.trim_end);if(F.audio_ids&&F.audio_ids.length)p.audio_ids=F.audio_ids;if(F.character_ids&&F.character_ids.length)p.character_ids=F.character_ids;
+    runJob('gemini-omni-video-edit',p,'Edit Video',out,status,btn,'video');
+  },'≈ $2.40 (720p/1080p) · $3.60 (4K)','✨ Apply edit');}
 
-function header(title,desc){return el('div',{class:'head'},el('h1',{},title),el('p',{},desc));}
-function workflowBar(steps){const w=el('div',{class:'workflow'});steps.forEach((s,i)=>{w.append(el('div',{class:'step'},el('span',{class:'n'},String(i+1)),el('b',{},s[0]),'· '+s[1]));});return w;}
+/* ===== CREATE: Avatars (voice + character) ===== */
+function viewAvatars(v){F={};v.append(header('Avatars 🧑‍🎤','Build reusable cast members: give them a fixed voice and a consistent face, then drop them into any video. Stored in your Library.'));keyNote(v);
+  let tab='character';const tabs=el('div',{class:'tabs'});const body=el('div',{});
+  const mk=(t,l)=>el('button',{class:t===tab?'sel':'',onclick:()=>{tab=t;[...tabs.children].forEach(c=>c.classList.toggle('sel',c.dataset.t===t));render();},'data-t':t},l);
+  tabs.append(mk('character','① Face & Character'),mk('voice','② Voice'));v.append(tabs,body);
+  function render(){body.innerHTML='';F={};(tab==='voice'?formVoice:formCharacter)(body);}render();}
+function formVoice(v){const grid=el('div',{class:'grid'});const left=el('div',{class:'card'});left.append(el('h3',{},'Create a voice'));left.append(fSelect('Base voice (30 presets)','base_voice',VOICES,true));left.append(fText('Name','profile_name','e.g. Narrator',true));left.append(fText('Voice description','voice_description','Warm, calm, slight British accent, gentle pacing',false,true));left.append(fText('Example line','example_dialogue','Hello, I am here to guide you'));
+  const right=el('div',{});const outCard=el('div',{class:'card'});outCard.append(el('h3',{},'Result'));const out=el('div',{class:'out'},'Saved to Library');outCard.append(out);const status=el('div',{class:'price'});outCard.append(status);
+  const btn=el('button',{class:'btn',onclick:async()=>{if(!LS.key)return toast('Connect first','err');if(!F.base_voice)return toast('Choose a base voice','err');if(!F.profile_name)return toast('Name required','err');btn.disabled=true;status.innerHTML='<span class="pill run">● creating</span>';
+    try{const p={base_voice:F.base_voice,profile_name:F.profile_name};if(F.voice_description)p.voice_description=F.voice_description;if(F.example_dialogue)p.example_dialogue=F.example_dialogue;let r=await apiSubmit('gemini-omni-audio',p);let aid=r.audio_id;if(!aid&&r.request_id){const res=await poll(r.request_id,st=>status.innerHTML='<span class="pill run">● '+st+'</span>');aid=res.audio_id||(res.outputs&&res.outputs[0]);}if(!aid)throw new Error('No voice id returned');const lib=LS.lib;lib.voices.push({audioId:aid,name:F.profile_name,base:F.base_voice});LS.lib=lib;out.innerHTML='';out.append(el('div',{},'🎙️ ',el('b',{},F.profile_name)),el('div',{class:'price'},el('code',{},aid)));status.innerHTML='<span class="pill ok">● saved</span>';renderNav();toast('Voice saved','ok');}catch(e){status.innerHTML='<span class="pill err">● '+e.message+'</span>';toast(e.message,'err');}finally{btn.disabled=false;}}},'🎙️ Create voice');
+  const act=el('div',{class:'card'});act.append(btn);act.append(el('div',{class:'price'},'Free'));right.append(act,outCard);grid.append(left,right);v.append(grid);}
+function formCharacter(v){F.images=[];const grid=el('div',{class:'grid'});const left=el('div',{class:'card'});left.append(el('h3',{},'Create a character'));left.append(fFiles('Reference image (exactly 1)','images',false,null));left.append(fText('Description','descriptions','Young woman, short silver hair, dark trench coat, composed',true,true));left.append(fText('Name','character_name','e.g. Aria'));left.append(picker('Attach voice','voices','audio_ids','audioId',3));
+  const right=el('div',{});const outCard=el('div',{class:'card'});outCard.append(el('h3',{},'Result'));const out=el('div',{class:'out'},'character + preview saved to Library');outCard.append(out);const status=el('div',{class:'price'});outCard.append(status);
+  const btn=el('button',{class:'btn',onclick:async()=>{if(!LS.key)return toast('Connect first','err');if(!(F.images&&F.images.length))return toast('Add exactly 1 image','err');if(!F.descriptions)return toast('Description required','err');btn.disabled=true;status.innerHTML='<span class="pill run">● uploading</span>';
+    try{const url=F.images[0].url||(F.images[0].url=await apiUpload(F.images[0].file));const p={descriptions:F.descriptions,images_list:[url]};if(F.character_name)p.character_name=F.character_name;if(F.audio_ids&&F.audio_ids.length)p.audio_ids=F.audio_ids;status.innerHTML='<span class="pill run">● creating</span>';let r=await apiSubmit('gemini-omni-character',p);let cid=r.character_id,img=(r.outputs&&r.outputs[0]);if(!cid&&r.request_id){const res=await poll(r.request_id,st=>status.innerHTML='<span class="pill run">● '+st+'</span>');cid=res.character_id;img=(res.outputs&&res.outputs[0])||img;}if(!cid)throw new Error('No character id returned');const lib=LS.lib;lib.characters.push({charId:cid,name:F.character_name||'Character',thumb:img||url});LS.lib=lib;out.innerHTML='';out.append(el('img',{src:img||url,style:'max-height:150px'}),el('div',{},el('b',{},F.character_name||'Character')),el('div',{class:'price'},el('code',{},cid)));status.innerHTML='<span class="pill ok">● saved</span>';renderNav();toast('Character saved','ok');}catch(e){status.innerHTML='<span class="pill err">● '+e.message+'</span>';toast(e.message,'err');}finally{btn.disabled=false;}}},'🧑‍🎤 Create character');
+  const act=el('div',{class:'card'});act.append(btn);act.append(el('div',{class:'price'},'Free'));right.append(act,outCard);grid.append(left,right);v.append(grid);}
 
-function viewSkill(id){
-  const s={...SKILLS[id],id:id==='t2v'?'t2v':id==='i2v'?'i2v':id};s.id=id; // keep id
-  F={};const v=$('#view');v.innerHTML='';
-  v.append(header(s.title+'  '+s.icon,s.desc));
-  if(!LS.key) v.append(el('div',{class:'note',html:'No API key yet. Add it in <b>Settings</b> to enable generation. The form below already reflects the exact workflow for this skill.'}));
-  v.append(workflowBar(s.workflow));
+/* ===== CREATE: Talking Avatar (engine: lipsync models) ===== */
+function viewTalking(v){F={};v.append(header('Talking Avatar 🗣️','Make any face speak: drop in a portrait + an audio track and get a lip-synced talking video.'));keyNote(v);
+  const models=(MODELS_BY_CAT['Audio to Video']||[]);
+  if(!models.length){v.append(el('div',{class:'note',html:'Engine catalog not loaded yet — open this on the live site. Falling back is not available offline.'}));}
+  v.append(workflowBar([['Portrait / avatar','image'],['Voice track','audio'],['Pick engine','sync / latent / creatify'],['Render','talking video']]));
+  splitLayout(v,left=>{left.append(fUrl('Portrait image','image','image/*',true));left.append(fUrl('Audio track','audio','audio/*',true));
+    const names=models.map(m=>m.variant?m.variant+' — '+m.name:m.name);F._model=models[0];const sel=el('select');models.forEach((m,i)=>sel.append(el('option',{value:i},names[i])));sel.onchange=()=>F._model=models[Number(sel.value)];left.append(wrap('Engine',sel));
+  },async(out,status,btn)=>{const m=F._model;if(!m)return toast('No engine available','err');if(!F.image)return toast('Add a portrait','err');if(!F.audio)return toast('Add an audio track','err');
+    // map common field names from the model schema
+    const p={};for(const f of m.fields){const n=f.name.toLowerCase();if(/image|video|face|portrait/.test(n)&&!p._img){p[f.name]=F.image;p._img=1;}else if(/audio|voice|sound/.test(n)&&!p._aud){p[f.name]=F.audio;p._aud=1;}}delete p._img;delete p._aud;
+    if(!Object.keys(p).length){p.image_url=F.image;p.audio_url=F.audio;}
+    runJob(m.endpoint,p,'Talking Avatar',out,status,btn,'video');
+  },'price varies by engine','🗣️ Generate');}
 
-  if(id==='audio')return formVoice(v);
-  if(id==='character')return formCharacter(v);
+/* ===== CREATE: Social Content (platform-guided) ===== */
+function viewSocial(v){F={};v.append(header('Social Content 📣','Pick a platform, describe the campaign, and get an asset in the right format — short video or post image — ready to publish.'));keyNote(v);
+  let plat='tiktok';
+  splitLayout(v,left=>{
+    const grid=el('div',{class:'platforms'});Object.entries(PLATFORMS).forEach(([k,pf])=>{const c=el('div',{class:'plat'+(k===plat?' sel':''),onclick:()=>{plat=k;[...grid.children].forEach(x=>x.classList.toggle('sel',x.dataset.k===k));pinfo.textContent=`Format ${pf.ar} · ${pf.kind==='image'?'image post':pf.dur+'s video'}`;},'data-k':k},el('span',{class:'e'},pf.e),pf.label,el('small',{},pf.ar));grid.append(c);});
+    left.append(wrap('Platform',grid));const pinfo=el('div',{class:'hint'},'Format 9:16 · 8s video');left.append(pinfo);
+    left.append(fText('Campaign brief','prompt','Energetic launch for a citrus energy drink — bold, fun, Gen-Z, upbeat music and a punchy tagline.',true,true));
+    left.append(fFiles('Product / brand image (optional)','images',false,'Anchors the product look.'));
+    left.append(assetsPanel());
+  },async(out,status,btn)=>{const pf=PLATFORMS[plat];if(!F.prompt)return toast('Brief required','err');
+    if(pf.kind==='image'){ // image post via flux-dev
+      const dims={'1:1':[1024,1024],'16:9':[1344,768],'9:16':[768,1344]}[pf.ar]||[1024,1024];
+      return runJob('flux-dev-image',{prompt:F.prompt,width:dims[0],height:dims[1],num_images:1},'Social: '+pf.label,out,status,btn,'image');
+    }
+    const p={prompt:F.prompt,duration:pf.dur,resolution:'1080p',aspect_ratio:pf.ar};if(F.audio_ids&&F.audio_ids.length)p.audio_ids=F.audio_ids;if(F.character_ids&&F.character_ids.length)p.character_ids=F.character_ids;let ep='gemini-omni-text-to-video';const imgs=F.images||[];
+    try{if(imgs.length){btn.disabled=true;status.innerHTML='<span class="pill run">● uploading</span>';p.image_urls=[];for(const it of imgs)p.image_urls.push(it.url||(it.url=await apiUpload(it.file)));ep='gemini-omni-image-to-video';}}catch(e){btn.disabled=false;status.innerHTML='';return toast(e.message,'err');}
+    runJob(ep,p,'Social: '+pf.label,out,status,btn,'video');
+  },'video ≈ $1.50+ · image ≈ low','📣 Create asset');}
 
-  const grid=el('div',{class:'grid'});
-  const left=el('div',{class:'card'});left.append(el('h3',{},'Inputs'));
-  buildFields(s,left);
-  if(s.fields.includes('assets'))left.append(fAssets());
-  const right=el('div',{});
-  const outCard=el('div',{class:'card'});outCard.append(el('h3',{},'Output'));
-  const out=el('div',{class:'out'},'Result appears here');outCard.append(out);
-  const status=el('div',{class:'price'},'');outCard.append(status);
-  const genBtn=el('button',{class:'btn',onclick:()=>runVideo(s,out,status,genBtn)},'✨ Generate');
-  const actions=el('div',{class:'card'});actions.append(genBtn);
-  actions.append(el('div',{class:'price'},priceLine(id)));
-  right.append(actions,outCard);
-  grid.append(left,right);v.append(grid);
-}
-function priceLine(id){return id==='edit'?'≈ $2.40 (720p/1080p) · $3.60 (4K)':'≈ $1.50–$3.00 by duration & resolution · audio included';}
+/* ===== CREATE: Images / Audio (schema-driven, friendly) ===== */
+function viewImages(v){catalogView(v,'Images 🎨','Generate and edit images across the full model roster.',[['Generate','Text to Image'],['Edit & Enhance','Image to Image']],'image');}
+function viewAudio(v){catalogView(v,'Audio & Music 🎵','Music, speech, sound effects and voice cloning.',[['All','Text to Audio']],'audio');}
+function viewAll(v){const cats=['Text to Image','Image to Image','Text to Video','Image to Video','Video to Video','Audio to Video','Text to Audio'];catalogView(v,'All Engines 🧩','Full control: every model behind the studio, with auto-built forms from the live schema.',cats.map(c=>[c,c]),'video');}
 
-async function runVideo(skill,out,status,btn){
-  if(!LS.key)return toast('Set your API key in Settings','err');
-  let payload;
-  try{out.innerHTML='';status.innerHTML='<span class="pill run">● preparing</span>';btn.disabled=true;
-    payload=await gatherVideoPayload(skill);
-  }catch(e){status.innerHTML='';btn.disabled=false;return toast(e.message,'err');}
-  try{
-    status.innerHTML='<span class="pill run">● uploading & submitting</span>';
-    const sub=await apiSubmit(skill.endpoint,payload);
-    const id=sub.request_id;if(!id)throw new Error('No request_id returned');
-    addHistory({id,skill:skill.title,endpoint:skill.endpoint,t:Date.now(),status:'processing'});
-    status.innerHTML=`<span class="pill run">● processing</span> <code>${id}</code>`;
-    const res=await poll(id,st=>status.innerHTML=`<span class="pill run">● ${st}</span> <code>${id}</code>`);
-    const url=(res.outputs&&res.outputs[0]);
-    out.innerHTML='';out.append(el('video',{src:url,controls:'1',autoplay:'1',loop:'1',muted:'1'}));
-    out.append(el('div',{class:'price'},el('a',{href:url,target:'_blank'},'⬇ open / download')));
-    status.innerHTML='<span class="pill ok">● completed</span>';
-    updHistory(id,'completed',url);toast('Done!','ok');
-  }catch(e){status.innerHTML='<span class="pill err">● '+e.message+'</span>';toast(e.message,'err');}
-  finally{btn.disabled=false;}
-}
+/* generic schema-driven catalog with category tabs */
+function catalogView(v,title,desc,catTabs,defKind){v.append(header(title,desc));
+  if(!MODELS.length){v.append(el('div',{class:'note',html:'Engine catalog (<code>models.json</code>) loads on the live site (same origin). The curated Create tabs work regardless.'}));return;}
+  keyNote(v);let ci=0;const tabs=el('div',{class:'tabs'});const host=el('div',{});
+  catTabs.forEach(([label,cat],i)=>tabs.append(el('button',{class:i===0?'sel':'',onclick:()=>{ci=i;[...tabs.children].forEach((c,j)=>c.classList.toggle('sel',j===i));renderCat();}},label)));
+  if(catTabs.length>1)v.append(tabs);v.append(host);
+  function renderCat(){host.innerHTML='';F={};const cat=catTabs[ci][1];const models=(MODELS_BY_CAT[cat]||[]);const grid=el('div',{class:'grid'});const left=el('div',{class:'card'});
+    const sel=el('select');models.forEach((m,i)=>sel.append(el('option',{value:i},(m.variant?m.variant+' — ':'')+m.name)));left.append(wrap('Model ('+models.length+')',sel));const mdesc=el('div',{class:'modeldesc'});const fbox=el('div',{});left.append(mdesc,fbox);
+    const right=el('div',{});const outCard=el('div',{class:'card'});outCard.append(el('h3',{},'Output'));const out=el('div',{class:'out'},'Result appears here');outCard.append(out);const status=el('div',{class:'price'});outCard.append(status);const btn=el('button',{class:'btn'},'✨ Generate');const act=el('div',{class:'card'});act.append(btn);const ep=el('div',{class:'price'});act.append(ep);right.append(act,outCard);
+    function loadModel(){const m=models[Number(sel.value)||0];mdesc.textContent=m.description||'';fbox.innerHTML='';F={};buildAutoForm(m,fbox);ep.innerHTML='engine: <code>'+m.endpoint+'</code>';btn.onclick=()=>{let pl;try{pl=gatherCatalog(m);}catch(e){return toast(e.message,'err');}runJob(m.endpoint,pl,m.name,out,status,btn,defKind);};}
+    sel.onchange=loadModel;grid.append(left,right);host.append(grid);loadModel();}
+  renderCat();}
+const RE_IMG=/(image|img|face|photo|portrait|ref|mask|logo|style)/i,RE_VID=/video|clip/i,RE_AUD=/audio|music|voice|speech|song|track/i;
+function fieldKind(f){const n=(f.name||'').toLowerCase(),t=(f.type||'string');if(f.enum&&f.enum.length)return'enum';if(t==='boolean'||t==='bool')return'bool';if(t==='int'||t==='integer'||t==='number'||t==='float')return'num';if(t==='array')return'array';if(/prompt|description|text|caption|lyrics|message|negative/.test(n))return'textarea';if(RE_VID.test(n)&&!/prompt/.test(n))return'vid';if(RE_AUD.test(n)&&/url|file|audio|music|voice|track/.test(n))return'aud';if(RE_IMG.test(n)&&!/prompt/.test(n))return'img';if(/url/.test(n))return'img';return'text';}
+function buildAutoForm(model,col){model.fields.forEach(f=>{const k=f.name,kind=fieldKind(f),lbl=pretty(k),hint=f.desc?String(f.desc).slice(0,120):null;
+  if(kind==='enum')col.append(fSeg(lbl,k,f.enum.map(String),f.default!=null?String(f.default):String(f.enum[0]),hint));
+  else if(kind==='bool'){F[k]=!!f.default;const cb=el('input',{type:'checkbox'});if(f.default)cb.checked=true;cb.onchange=()=>F[k]=cb.checked;col.append(wrap(null,el('label',{class:'toggle'},cb,lbl),hint,false));}
+  else if(kind==='num'){F[k]=f.default!=null?f.default:'';const n=el('input',{type:'number'});if(f.default!=null)n.value=f.default;n.oninput=()=>F[k]=n.value;col.append(wrap(lbl,n,hint,f.req));}
+  else if(kind==='textarea')col.append(fText(lbl,k,hint||'',f.req,true));
+  else if(kind==='vid')col.append(fUrl(lbl,k,'video/*',f.req,hint));
+  else if(kind==='aud')col.append(fUrl(lbl,k,'audio/*',f.req,hint));
+  else if(kind==='img')col.append(fUrl(lbl,k,'image/*',f.req,hint));
+  else if(kind==='array'){F[k]=[];const ta=el('textarea',{placeholder:'one URL per line'});ta.oninput=()=>F[k]=ta.value.split('\n').map(s=>s.trim()).filter(Boolean);const file=el('input',{type:'file',style:'display:none'});const up=el('button',{onclick:async e=>{e.preventDefault();if(!LS.key)return toast('Connect first','err');file.click();}},'⬆ upload + add');file.onchange=async()=>{try{const u=await apiUpload(file.files[0]);ta.value=(ta.value?ta.value+'\n':'')+u;F[k]=ta.value.split('\n').map(s=>s.trim()).filter(Boolean);toast('Added','ok');}catch(e){toast(e.message,'err');}};col.append(wrap(lbl,el('div',{},ta,el('div',{class:'seg'},up),file),hint,f.req));}
+  else col.append(fText(lbl,k,hint||'',f.req,false));});}
+function gatherCatalog(model){const p={};for(const f of model.fields){const k=f.name,kind=fieldKind(f);let v=F[k];if(kind==='num'){if(v!==''&&v!=null&&!Number.isNaN(Number(v)))p[k]=Number(v);else if(f.req&&f.default!=null)p[k]=f.default;}else if(kind==='bool'){if(v||f.req)p[k]=!!v;}else if(kind==='array'){if(Array.isArray(v)&&v.length)p[k]=v;}else{if(v!=null&&v!=='')p[k]=v;}if(f.req&&(p[k]==null||p[k]===''||(Array.isArray(p[k])&&!p[k].length)))throw new Error('Required: '+pretty(k));}return p;}
 
-/* ----- Voice profile form ----- */
-function formVoice(v){
-  const grid=el('div',{class:'grid'});
-  const left=el('div',{class:'card'});left.append(el('h3',{},'New voice profile'));
-  left.append(fSelect('Base voice (30 presets)','base_voice',VOICES,true));
-  left.append(fText('Profile name','profile_name','e.g. Narrator',true));
-  left.append(fText('Voice description','voice_description','Warm, calm, slight British accent, gentle pacing',false,true));
-  left.append(fText('Example dialogue','example_dialogue','Hello, I am here to guide you (≤120 chars)'));
-  const right=el('div',{});const outCard=el('div',{class:'card'});outCard.append(el('h3',{},'Result'));
-  const out=el('div',{class:'out'},'audio_id appears here & is saved to Library');outCard.append(out);
-  const status=el('div',{class:'price'});outCard.append(status);
-  const btn=el('button',{class:'btn',onclick:async()=>{
-    if(!LS.key)return toast('Set API key','err');
-    if(!F.base_voice)return toast('Choose a base voice','err');
-    if(!F.profile_name)return toast('Name required','err');
-    btn.disabled=true;status.innerHTML='<span class="pill run">● creating</span>';
-    try{const p={base_voice:F.base_voice,profile_name:F.profile_name};
-      if(F.voice_description)p.voice_description=F.voice_description;
-      if(F.example_dialogue)p.example_dialogue=F.example_dialogue;
-      let r=await apiSubmit('gemini-omni-audio',p);
-      let aid=r.audio_id; if(!aid&&r.request_id){const res=await poll(r.request_id,st=>status.innerHTML='<span class="pill run">● '+st+'</span>');aid=res.audio_id||(res.outputs&&res.outputs[0]);}
-      if(!aid)throw new Error('No audio_id returned');
-      const lib=LS.lib;lib.voices.push({audioId:aid,name:F.profile_name,base:F.base_voice});LS.lib=lib;
-      out.innerHTML='';out.append(el('div',{},'🎙️ ',el('b',{},F.profile_name)),el('div',{class:'price'},el('code',{},aid)));
-      status.innerHTML='<span class="pill ok">● saved to Library</span>';renderNav();toast('Voice saved','ok');
-    }catch(e){status.innerHTML='<span class="pill err">● '+e.message+'</span>';toast(e.message,'err');}
-    finally{btn.disabled=false;}
-  }},'🎙️ Create voice');
-  const act=el('div',{class:'card'});act.append(btn);act.append(el('div',{class:'price'},'Free'));
-  right.append(act,outCard);grid.append(left,right);v.append(grid);
-}
-
-/* ----- Character form ----- */
-function formCharacter(v){
-  F.images=[];
-  const grid=el('div',{class:'grid'});
-  const left=el('div',{class:'card'});left.append(el('h3',{},'New character'));
-  left.append(fFiles('Reference image (exactly 1)','images',false,null));
-  left.append(fText('Character description','descriptions','Young woman, short silver hair, dark trench coat, composed',true,true));
-  left.append(fText('Character name','character_name','e.g. Aria'));
-  left.append(picker('Attach voice profiles','voices','audio_ids','audioId',3));F.audio_ids=F.audio_ids||[];
-  const right=el('div',{});const outCard=el('div',{class:'card'});outCard.append(el('h3',{},'Result'));
-  const out=el('div',{class:'out'},'character_id + preview saved to Library');outCard.append(out);
-  const status=el('div',{class:'price'});outCard.append(status);
-  const btn=el('button',{class:'btn',onclick:async()=>{
-    if(!LS.key)return toast('Set API key','err');
-    if(!(F.images&&F.images.length))return toast('Add exactly 1 image','err');
-    if(!F.descriptions)return toast('Description required','err');
-    btn.disabled=true;status.innerHTML='<span class="pill run">● uploading</span>';
-    try{const url=F.images[0].url||(F.images[0].url=await apiUpload(F.images[0].file));
-      const p={descriptions:F.descriptions,images_list:[url]};
-      if(F.character_name)p.character_name=F.character_name;
-      if(F.audio_ids&&F.audio_ids.length)p.audio_ids=F.audio_ids;
-      status.innerHTML='<span class="pill run">● creating</span>';
-      let r=await apiSubmit('gemini-omni-character',p);
-      let cid=r.character_id,img=(r.outputs&&r.outputs[0]);
-      if(!cid&&r.request_id){const res=await poll(r.request_id,st=>status.innerHTML='<span class="pill run">● '+st+'</span>');cid=res.character_id;img=(res.outputs&&res.outputs[0])||img;}
-      if(!cid)throw new Error('No character_id returned');
-      const lib=LS.lib;lib.characters.push({charId:cid,name:F.character_name||'Character',thumb:img||url});LS.lib=lib;
-      out.innerHTML='';out.append(el('img',{src:img||url,style:'max-height:150px'}),el('div',{},el('b',{},F.character_name||'Character')),el('div',{class:'price'},el('code',{},cid)));
-      status.innerHTML='<span class="pill ok">● saved to Library</span>';renderNav();toast('Character saved','ok');
-    }catch(e){status.innerHTML='<span class="pill err">● '+e.message+'</span>';toast(e.message,'err');}
-    finally{btn.disabled=false;}
-  }},'🧑‍🎤 Create character');
-  const act=el('div',{class:'card'});act.append(btn);act.append(el('div',{class:'price'},'Free'));
-  right.append(act,outCard);grid.append(left,right);v.append(grid);
-}
-
-/* ----- Library ----- */
-function viewLibrary(){
-  const v=$('#view');v.innerHTML='';v.append(header('Library 📚','Reusable voice profiles and characters. Their IDs auto-appear in the video pickers.'));
-  const lib=LS.lib;const grid=el('div',{class:'grid'});
-  const c1=el('div',{class:'card'});c1.append(el('h3',{},'🎙️ Voice profiles'));
-  if(!lib.voices.length)c1.append(el('div',{class:'empty'},'None yet.'));
-  lib.voices.forEach((it,i)=>c1.append(libItem('🎙️',it.name,it.audioId,()=>{lib.voices.splice(i,1);LS.lib=lib;viewLibrary();renderNav();})));
-  const c2=el('div',{class:'card'});c2.append(el('h3',{},'🧑‍🎤 Characters'));
-  if(!lib.characters.length)c2.append(el('div',{class:'empty'},'None yet.'));
-  lib.characters.forEach((it,i)=>c2.append(libItem(it.thumb,it.name,it.charId,()=>{lib.characters.splice(i,1);LS.lib=lib;viewLibrary();renderNav();})));
-  grid.append(c1,c2);v.append(grid);
-}
-function libItem(icon,name,id,onDel){
-  const row=el('div',{class:'libitem'});
-  row.append(icon&&icon.startsWith&&icon.startsWith('http')?el('img',{src:icon}):el('span',{style:'font-size:22px'},icon||'🎙️'));
-  row.append(el('div',{class:'meta'},el('b',{},name||'(unnamed)'),el('small',{},id||'')));
-  row.append(el('button',{class:'copy',onclick:()=>{navigator.clipboard.writeText(id);toast('ID copied','ok')}},'copy'));
-  row.append(el('button',{class:'copy',onclick:onDel,style:'border-color:var(--err);color:var(--err)'},'del'));
-  return row;
-}
-
-/* ----- History ----- */
+/* ===== Library / History / Settings ===== */
+function viewLibrary(v){v.append(header('Library 📚','Your reusable voices and characters. Their IDs auto-appear in the video pickers.'));const lib=LS.lib;const grid=el('div',{class:'grid'});
+  const c1=el('div',{class:'card'});c1.append(el('h3',{},'🎙️ Voices'));if(!lib.voices.length)c1.append(el('div',{class:'empty'},'None yet.'));lib.voices.forEach((it,i)=>c1.append(libItem('🎙️',it.name,it.audioId,()=>{lib.voices.splice(i,1);LS.lib=lib;go('library');})));
+  const c2=el('div',{class:'card'});c2.append(el('h3',{},'🧑‍🎤 Characters'));if(!lib.characters.length)c2.append(el('div',{class:'empty'},'None yet.'));lib.characters.forEach((it,i)=>c2.append(libItem(it.thumb,it.name,it.charId,()=>{lib.characters.splice(i,1);LS.lib=lib;go('library');})));
+  grid.append(c1,c2);v.append(grid);}
+function libItem(icon,name,id,onDel){const row=el('div',{class:'libitem'});row.append(icon&&icon.startsWith&&icon.startsWith('http')?el('img',{src:icon}):el('span',{style:'font-size:22px'},icon||'🎙️'));row.append(el('div',{class:'meta'},el('b',{},name||'(unnamed)'),el('small',{},id||'')));row.append(el('button',{class:'copy',onclick:()=>{navigator.clipboard.writeText(id);toast('ID copied','ok')}},'copy'));row.append(el('button',{class:'copy',onclick:onDel,style:'border-color:var(--err);color:var(--err)'},'del'));return row;}
 function addHistory(h){const a=LS.hist;a.unshift(h);LS.hist=a;renderNav();}
 function updHistory(id,status,url){const a=LS.hist;const h=a.find(x=>x.id===id);if(h){h.status=status;if(url)h.url=url;}LS.hist=a;}
-function viewHistory(){
-  const v=$('#view');v.innerHTML='';v.append(header('History 🕘','Recent jobs. Video generation can take minutes — re-poll any processing job.'));
-  const card=el('div',{class:'card hist'});const a=LS.hist;
-  if(!a.length)card.append(el('div',{class:'empty'},'No jobs yet.'));
-  a.forEach(h=>{
-    const cls=h.status==='completed'?'ok':h.status==='failed'?'err':'run';
-    const row=el('div',{class:'h'});
-    row.append(el('span',{class:'pill '+cls},'● '+h.status),el('b',{},h.skill),el('code',{},h.id));
-    if(h.url)row.append(el('a',{href:h.url,target:'_blank'},'open'));
-    else if(h.status!=='failed')row.append(el('a',{href:'#',onclick:async e=>{e.preventDefault();try{const r=await apiResult(h.id);if(r.status==='completed'){updHistory(h.id,'completed',r.outputs&&r.outputs[0]);viewHistory();}else toast('Still '+(r.status||'processing'));}catch(err){toast(err.message,'err');}}},'re-poll'));
-    row.append(el('span',{class:'t'},new Date(h.t).toLocaleString()));
-    card.append(row);
-  });
+function viewHistory(v){v.append(header('History 🕘','Recent jobs. Video can take minutes — re-poll any processing job.'));const card=el('div',{class:'card hist'});const a=LS.hist;if(!a.length)card.append(el('div',{class:'empty'},'No jobs yet.'));
+  a.forEach(h=>{const cls=h.status==='completed'?'ok':h.status==='failed'?'err':'run';const row=el('div',{class:'h'});row.append(el('span',{class:'pill '+cls},'● '+h.status),el('b',{},h.skill),el('code',{},h.id));if(h.url)row.append(el('a',{href:h.url,target:'_blank'},'open'));else if(h.status!=='failed')row.append(el('a',{href:'#',onclick:async e=>{e.preventDefault();try{const r=await apiResult(h.id);if(r.status==='completed'){updHistory(h.id,'completed',r.outputs&&r.outputs[0]);go('history');}else toast('Still '+(r.status||'processing'));}catch(err){toast(err.message,'err');}}},'re-poll'));row.append(el('span',{class:'t'},new Date(h.t).toLocaleString()));card.append(row);});v.append(card);}
+function viewSettings(v){v.append(header('Settings ⚙️','Your engine key is stored only in this browser (localStorage).'));
+  const card=el('div',{class:'card',style:'max-width:560px'});const key=el('input',{type:'text',placeholder:'your engine key',value:LS.key});const base=el('input',{type:'text',value:LS.base});const bn=el('input',{type:'text',value:BRAND.name});const bs=el('input',{type:'text',value:BRAND.sub});
+  card.append(wrap('Engine API key',key,'Sent privately from your browser to the engine.',true));card.append(wrap('Engine base URL',base,'On a CORS error, point this at your own proxy.'));
+  card.append(el('button',{class:'btn',onclick:()=>{LS.key=key.value.trim();LS.base=base.value.trim()||'https://api.muapi.ai/api/v1';renderNav();toast('Saved','ok');}},'Save connection'));
   v.append(card);
-}
+  const brandCard=el('div',{class:'card',style:'max-width:560px;margin-top:18px'});brandCard.append(el('h3',{},'Brand'));brandCard.append(wrap('Product name',bn));brandCard.append(wrap('Tagline',bs));brandCard.append(el('button',{class:'btn ghost',onclick:()=>{BRAND.name=bn.value||BRAND.name;BRAND.sub=bs.value||BRAND.sub;renderNav();toast('Brand updated (this session) — edit the BRAND line in the file to persist','ok');}},'Preview brand'));v.append(brandCard);
+  const tools=el('div',{class:'card',style:'max-width:560px;margin-top:18px'});tools.append(el('h3',{},'Data'));tools.append(el('button',{class:'btn ghost',onclick:()=>{if(confirm('Clear Library + History?')){localStorage.removeItem('nova_lib');localStorage.removeItem('nova_hist');renderNav();go('settings');toast('Cleared');}}},'Clear Library & History'));v.append(tools);}
 
-/* ----- Settings ----- */
-function viewSettings(){
-  const v=$('#view');v.innerHTML='';v.append(header('Settings ⚙️','Your API key is stored only in this browser (localStorage). Get one at muapi.ai/dashboard.'));
-  const card=el('div',{class:'card',style:'max-width:560px'});
-  const key=el('input',{type:'text',placeholder:'mu_...',value:LS.key});
-  const base=el('input',{type:'text',value:LS.base});
-  card.append(wrap('MuAPI API key',key,'Header sent as <code>x-api-key</code>.',true));
-  card.append(wrap('API base URL',base,'Default <code>https://api.muapi.ai/api/v1</code>. If the browser hits a CORS error, point this at your own proxy.'));
-  card.append(el('button',{class:'btn',onclick:()=>{LS.key=key.value.trim();LS.base=base.value.trim()||'https://api.muapi.ai/api/v1';renderNav();toast('Saved','ok');}},'Save'));
-  card.append(el('div',{class:'note',style:'margin-top:18px',html:'⚠️ <b>Gemini Omni endpoints go live when you wire up the Omni API.</b> This dashboard already sends the correct payloads (<code>gemini-omni-text-to-video</code>, <code>-image-to-video</code>, <code>-video-edit</code>, <code>-audio</code>, <code>-character</code>). Until the API is enabled on your key, calls will return an error — the UI/workflow is ready.'}));
-  v.append(card);
-  // data tools
-  const tools=el('div',{class:'card',style:'max-width:560px;margin-top:18px'});
-  tools.append(el('h3',{},'Data'));
-  tools.append(el('button',{class:'btn ghost',onclick:()=>{if(confirm('Clear Library + History?')){localStorage.removeItem('omni_lib');localStorage.removeItem('omni_hist');renderNav();toast('Cleared');go('settings');}}},'Clear Library & History'));
-  v.append(tools);
-}
-
-/* ---------- boot ---------- */
-renderNav();go('t2v');
+/* ===== boot ===== */
+async function boot(){renderNav();go('video');try{const r=await fetch('./models.json');MODELS=await r.json();MODELS_BY_CAT={};MODELS.forEach(m=>{(MODELS_BY_CAT[m.category]=MODELS_BY_CAT[m.category]||[]).push(m);});renderNav();}catch(e){console.warn('models.json not loaded',e);}}
+boot();
 </script>
 </body>
 </html>
