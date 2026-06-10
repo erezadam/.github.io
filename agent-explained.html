@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מה זה סוכן AI? הסבר פשוט</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0d1330;
+    --card: rgba(255,255,255,0.07);
+    --accent: #4fc3f7;
+    --green: #66bb6a;
+    --orange: #ffa726;
+    --pink: #f06292;
+    --red: #ef5350;
+    --text: #eef4ff;
+    --muted: #a9bcd8;
+  }
+
+  body {
+    font-family: 'Segoe UI', 'Heebo', Arial, sans-serif;
+    background: radial-gradient(ellipse at top, #20306b 0%, var(--bg) 65%);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  .wrap { max-width: 980px; margin: 0 auto; padding: 26px 16px 70px; }
+
+  header { text-align: center; margin-bottom: 20px; }
+  header h1 {
+    font-size: clamp(1.5rem, 4vw, 2.3rem);
+    background: linear-gradient(90deg, #4fc3f7, #b388ff, #f06292);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+  header p { color: var(--muted); font-size: 1.05rem; line-height: 1.7; }
+  header p b { color: var(--text); }
+
+  .steps { display: flex; justify-content: center; gap: 10px; margin: 22px 0; flex-wrap: wrap; }
+  .step-btn {
+    background: var(--card);
+    border: 2px solid transparent;
+    color: var(--text);
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-size: 0.98rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .step-btn:hover { transform: translateY(-2px); }
+  .step-btn.active { border-color: var(--accent); background: rgba(79,195,247,0.15); }
+
+  .panel {
+    display: none;
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 18px;
+    padding: 24px 22px;
+    animation: fadeIn .4s;
+  }
+  .panel.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
+
+  .panel h2 { font-size: 1.35rem; margin-bottom: 10px; }
+  .panel .explain { color: var(--muted); line-height: 1.9; margin-bottom: 18px; font-size: 1.05rem; }
+  .panel .explain b { color: var(--text); }
+
+  /* Step 1: chat vs agent comparison */
+  .vs { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 640px) { .vs { grid-template-columns: 1fr; } }
+  .vs-card {
+    border-radius: 16px;
+    padding: 18px;
+    line-height: 1.9;
+  }
+  .vs-card.chat-side { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.15); }
+  .vs-card.agent-side { background: rgba(102,187,106,0.08); border: 2px solid var(--green); }
+  .vs-card h3 { font-size: 1.15rem; margin-bottom: 10px; }
+  .vs-card.agent-side h3 { color: var(--green); }
+  .vs-card .row { margin-bottom: 8px; color: var(--muted); }
+  .vs-card .row b { color: var(--text); }
+  .vs-card .punch { margin-top: 12px; font-weight: 800; }
+  .vs-card.chat-side .punch { color: var(--orange); }
+  .vs-card.agent-side .punch { color: var(--green); }
+
+  .note {
+    background: rgba(79,195,247,0.1);
+    border-right: 4px solid var(--accent);
+    border-radius: 8px;
+    padding: 13px 16px;
+    line-height: 1.8;
+    margin-top: 16px;
+  }
+  .note.green { border-right-color: var(--green); background: rgba(102,187,106,0.1); }
+  .note b { color: var(--accent); }
+  .note.green b { color: var(--green); }
+
+  /* Step 2: the loop */
+  .loop {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+  .loop-node {
+    background: rgba(0,0,0,0.3);
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 14px;
+    padding: 14px 12px;
+    text-align: center;
+    cursor: pointer;
+    width: 130px;
+    transition: all .25s;
+  }
+  .loop-node:hover, .loop-node.lit {
+    border-color: var(--accent);
+    box-shadow: 0 0 18px rgba(79,195,247,0.45);
+    transform: translateY(-3px);
+  }
+  .loop-node .ic { font-size: 1.8rem; margin-bottom: 6px; }
+  .loop-node .nm { font-weight: 800; font-size: 0.95rem; }
+  .loop-arrow { align-self: center; color: var(--muted); font-size: 1.3rem; font-weight: 800; }
+
+  .loop-back {
+    text-align: center;
+    color: var(--pink);
+    font-weight: 800;
+    margin: 10px 0 14px;
+    font-size: 1rem;
+  }
+
+  .loop-info {
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    padding: 14px 16px;
+    min-height: 64px;
+    line-height: 1.8;
+    text-align: center;
+  }
+  .loop-info b { color: var(--accent); }
+  .loop-info .placeholder { color: var(--muted); }
+
+  /* Step 3: live demo */
+  button.action {
+    background: linear-gradient(90deg, #2196f3, #4fc3f7);
+    border: none; color: #fff;
+    font-size: 1.1rem; font-weight: 700;
+    padding: 12px 28px; border-radius: 12px; cursor: pointer;
+    transition: transform .15s, box-shadow .15s;
+    display: block; margin: 0 auto 16px;
+  }
+  button.action:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(33,150,243,0.4); }
+  button.action:disabled { opacity: 0.4; cursor: default; transform: none; box-shadow: none; }
+
+  .goal-box {
+    background: linear-gradient(135deg, #1565c0, #1e88e5);
+    border-radius: 14px;
+    padding: 14px 18px;
+    text-align: center;
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  .goal-box .who { display: block; font-size: 0.78rem; color: rgba(255,255,255,0.75); margin-bottom: 3px; }
+
+  .log { display: flex; flex-direction: column; gap: 9px; min-height: 140px; }
+  .log-item {
+    border-radius: 12px;
+    padding: 10px 14px;
+    line-height: 1.7;
+    font-size: 1rem;
+    animation: fadeIn .35s;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  .log-item.plan { border-color: var(--accent); }
+  .log-item.fail { border-color: var(--red); background: rgba(239,83,80,0.1); }
+  .log-item.retry { border-color: var(--pink); background: rgba(240,98,146,0.1); }
+  .log-item.done { border-color: var(--green); background: rgba(102,187,106,0.1); font-weight: 700; }
+  .skill-chip {
+    border: 1.5px dashed var(--orange);
+    color: var(--orange);
+    border-radius: 999px;
+    padding: 3px 12px;
+    font-size: 0.88rem;
+    font-weight: 800;
+    background: rgba(255,213,79,0.08);
+    white-space: nowrap;
+  }
+  .ok { color: var(--green); font-weight: 800; }
+  .magic-label {
+    text-align: center;
+    color: var(--pink);
+    font-weight: 800;
+    font-size: 1.05rem;
+    min-height: 26px;
+    margin-top: 12px;
+  }
+
+  footer { text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 24px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🤖 מה זה סוכן AI? כשה-Skills מתחילים לעבוד לבד</h1>
+    <p>
+      זוכרים את דפי ההוראות (Skills)? <b>סוכן הוא העובד שמחזיק את כל הקלסר</b> —
+      נותנים לו מטרה, והוא לבד מתכנן, שולף את ה-Skill הנכון לכל שלב,
+      בודק את עצמו <b>ומתקן את הטעויות של עצמו</b>.
+    </p>
+  </header>
+
+  <div class="steps">
+    <button class="step-btn active" data-step="1">1️⃣ צ'אט מול סוכן</button>
+    <button class="step-btn" data-step="2">2️⃣ הלולאה הקסומה</button>
+    <button class="step-btn" data-step="3">3️⃣ סוכן בפעולה!</button>
+  </div>
+
+  <!-- STEP 1 -->
+  <section class="panel active" id="panel1">
+    <h2>שלב 1: ההבדל בין "לשאול" ל"להטיל משימה"</h2>
+    <p class="explain">
+      עד עכשיו דיברנו עם ה-AI כמו עם <b>יועץ</b>: שאלה ↔ תשובה, ואת העבודה עושים אנחנו.
+      סוכן זה משהו אחר לגמרי — הוא <b>עובד</b> שמקבל משימה שלמה והולך לבצע אותה.
+    </p>
+
+    <div class="vs">
+      <div class="vs-card chat-side">
+        <h3>💬 צ'אט רגיל = יועץ</h3>
+        <div class="row">👤 "איך כותבים דוח מכירות?"</div>
+        <div class="row">🤖 מסביר יפה...</div>
+        <div class="row">👤 ואז <b>אתם</b>: אוספים נתונים, מחשבים, כותבים, שולחים.</div>
+        <div class="punch">תשובה אחת על שאלה אחת — השאר עליכם.</div>
+      </div>
+      <div class="vs-card agent-side">
+        <h3>🤖 סוכן = עובד</h3>
+        <div class="row">👤 "הכן את דוח המכירות החודשי ושלח להנהלה."</div>
+        <div class="row">🤖 מתכנן ← אוסף נתונים ← מחשב ← כותב ← <b>בודק את עצמו</b> ← שולח.</div>
+        <div class="row">👤 אתם? שותים קפה ☕</div>
+        <div class="punch">חוזר אליכם רק כשהמשימה גמורה.</div>
+      </div>
+    </div>
+
+    <div class="note">
+      💡 <b>וזה הקשר ל-Skills:</b> כל שלב במשימה הוא Skill אחד מהקלסר —
+      "שליפת נתונים", "כתיבת דוח", "שליחת מייל".
+      סוכן הוא <b>רצף של Skills</b> שמופעלים זה אחרי זה, עם מוח אחד שמנצח על כולם.
+    </div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="panel" id="panel2">
+    <h2>שלב 2: הלולאה שמניעה כל סוכן (לחצו על כל תחנה)</h2>
+    <p class="explain">
+      הסוד של כל סוכן בעולם הוא לולאה אחת פשוטה שרצה שוב ושוב עד שהמשימה הושלמה:
+    </p>
+
+    <div class="loop" id="loop">
+      <div class="loop-node" data-i="0"><div class="ic">🎯</div><div class="nm">מקבל מטרה</div></div>
+      <div class="loop-arrow">←</div>
+      <div class="loop-node" data-i="1"><div class="ic">🧠</div><div class="nm">מתכנן שלבים</div></div>
+      <div class="loop-arrow">←</div>
+      <div class="loop-node" data-i="2"><div class="ic">📋</div><div class="nm">שולף Skill</div></div>
+      <div class="loop-arrow">←</div>
+      <div class="loop-node" data-i="3"><div class="ic">⚙️</div><div class="nm">מבצע</div></div>
+      <div class="loop-arrow">←</div>
+      <div class="loop-node" data-i="4"><div class="ic">🔍</div><div class="nm">בודק את עצמו</div></div>
+    </div>
+    <div class="loop-back">🔁 לא מושלם? הסוכן חוזר אחורה, מתקן ומנסה שוב — בלי לשאול אתכם!</div>
+
+    <div class="loop-info" id="loopInfo">
+      <span class="placeholder">לחצו על תחנה בלולאה — או על ▶ כדי לראות אותה רצה</span>
+    </div>
+
+    <button class="action" id="loopPlay" style="margin-top:16px">▶ הרץ את הלולאה</button>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="panel" id="panel3">
+    <h2>שלב 3: סוכן אמיתי בפעולה — צפו בקסם</h2>
+    <p class="explain">
+      נותנים לסוכן משימה אחת — ועוקבים אחרי ה"מחשבות" שלו.
+      שימו לב במיוחד למה שקורה בשלב 4... 👀
+    </p>
+
+    <div class="goal-box">
+      <span class="who">👤 המשימה שלכם לסוכן:</span>
+      "הכן את דוח המכירות החודשי ושלח אותו להנהלה"
+    </div>
+
+    <button class="action" id="runAgent">🚀 שגר את הסוכן</button>
+
+    <div class="log" id="log"></div>
+    <div class="magic-label" id="magic"></div>
+  </section>
+
+  <footer>הדגמה חינוכית · סוכן = רצף Skills + לולאה של ביצוע, בדיקה עצמית ותיקון</footer>
+</div>
+
+<script>
+/* Step navigation */
+document.querySelectorAll('.step-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.step-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel' + btn.dataset.step).classList.add('active');
+  });
+});
+
+/* Step 2: loop explanations + animation */
+const LOOP_INFO = [
+  '<b>🎯 מקבל מטרה:</b> לא "שאלה" אלא משימה שלמה. למשל: "הכן דוח ושלח להנהלה". זו נקודת הפתיחה.',
+  '<b>🧠 מתכנן שלבים:</b> הסוכן מפרק את המטרה לשלבים קטנים — בדיוק כמו שעובד מנוסה מכין לעצמו רשימת משימות.',
+  '<b>📋 שולף Skill:</b> לכל שלב הוא בוחר לבד את דף ההוראות המתאים מהקלסר — "שליפת נתונים", "כתיבת דוח", "שליחת מייל".',
+  '<b>⚙️ מבצע:</b> הסוכן באמת עושה את הפעולה — קורא קבצים, כותב, מחשב, שולח. לא רק מדבר על זה.',
+  '<b>🔍 בודק את עצמו:</b> החלק הגאוני! לפני שממשיך, הסוכן עוצר ושואל: "האם זה באמת טוב?" — ואם לא, חוזר ומתקן.'
+];
+const loopInfo = document.getElementById('loopInfo');
+const nodes = [...document.querySelectorAll('.loop-node')];
+nodes.forEach(n => n.addEventListener('click', () => {
+  nodes.forEach(x => x.classList.remove('lit'));
+  n.classList.add('lit');
+  loopInfo.innerHTML = LOOP_INFO[+n.dataset.i];
+}));
+
+const loopPlay = document.getElementById('loopPlay');
+loopPlay.addEventListener('click', async () => {
+  loopPlay.disabled = true;
+  for (let round = 0; round < 2; round++) {
+    for (let i = 0; i < nodes.length; i++) {
+      nodes.forEach(x => x.classList.remove('lit'));
+      nodes[i].classList.add('lit');
+      loopInfo.innerHTML = LOOP_INFO[i];
+      await new Promise(r => setTimeout(r, 1300));
+    }
+    if (round === 0) {
+      loopInfo.innerHTML = '<b style="color:var(--pink)">🔁 הבדיקה מצאה בעיה — הלולאה רצה שוב מההתחלה!</b>';
+      await new Promise(r => setTimeout(r, 1600));
+    }
+  }
+  nodes.forEach(x => x.classList.remove('lit'));
+  loopInfo.innerHTML = '<b style="color:var(--green)">✅ הבדיקה עברה — המשימה הושלמה והסוכן חוזר אליכם עם התוצאה!</b>';
+  loopPlay.disabled = false;
+});
+
+/* Step 3: live agent demo */
+const SCRIPT = [
+  { cls: 'plan', html: '🧠 <b>מתכנן:</b> מפרק את המשימה ל-4 שלבים: נתונים ← חישוב ← דוח ← שליחה' },
+  { cls: '', html: '1️⃣ <span class="skill-chip">📋 Skill: שליפת נתונים</span> אוסף את מכירות החודש מהמערכת... <span class="ok">✅ 312 עסקאות נמצאו</span>' },
+  { cls: '', html: '2️⃣ <span class="skill-chip">📋 Skill: חישוב סיכומים</span> מחשב סכומים והשוואה לחודש קודם... <span class="ok">✅ עלייה של 8%</span>' },
+  { cls: '', html: '3️⃣ <span class="skill-chip">📋 Skill: כתיבת דוח</span> כותב את הדוח בפורמט החברה... <span class="ok">✅ טיוטה מוכנה</span>' },
+  { cls: 'fail', html: '4️⃣ 🔍 <b>בדיקה עצמית:</b> "רגע... בפורמט החברה חייב להיות גרף השוואה — והוא חסר!" ❌', magic: '👀 שימו לב: אף אחד לא אמר לו — הוא מצא את הטעות לבד!' },
+  { cls: 'retry', html: '🔁 <b>מתקן את עצמו:</b> חוזר ל-Skill "כתיבת דוח", מוסיף את הגרף... <span class="ok">✅ הבדיקה עברה</span>', magic: '✨ זה ההבדל בין כלי לסוכן: הוא משתפר תוך כדי עבודה' },
+  { cls: '', html: '5️⃣ <span class="skill-chip">📋 Skill: שליחת מייל</span> שולח את הדוח להנהלה... <span class="ok">✅ נשלח</span>' },
+  { cls: 'done', html: '🎉 <b>הסוכן מדווח:</b> "המשימה הושלמה! 4 שלבים, תיקון עצמי אחד. הדוח אצל ההנהלה."', magic: '☕ ואתם? בדיוק סיימתם את הקפה.' },
+];
+
+const log = document.getElementById('log');
+const magic = document.getElementById('magic');
+const runBtn = document.getElementById('runAgent');
+
+runBtn.addEventListener('click', async () => {
+  runBtn.disabled = true;
+  log.innerHTML = '';
+  magic.textContent = '';
+  for (const item of SCRIPT) {
+    await new Promise(r => setTimeout(r, 1500));
+    const div = document.createElement('div');
+    div.className = 'log-item ' + item.cls;
+    div.innerHTML = item.html;
+    log.appendChild(div);
+    if (item.magic) magic.textContent = item.magic;
+    div.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+  runBtn.disabled = false;
+  runBtn.textContent = '🔄 שגר שוב';
+});
+</script>
+</body>
+</html>
