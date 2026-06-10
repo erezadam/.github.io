@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>איך מודל שפה עובד? הדגמה פשוטה</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0d1330;
+    --card: rgba(255,255,255,0.07);
+    --accent: #4fc3f7;
+    --green: #66bb6a;
+    --orange: #ffa726;
+    --pink: #f06292;
+    --text: #eef4ff;
+    --muted: #a9bcd8;
+  }
+
+  body {
+    font-family: 'Segoe UI', 'Heebo', Arial, sans-serif;
+    background: radial-gradient(ellipse at top, #20306b 0%, var(--bg) 65%);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  .wrap { max-width: 900px; margin: 0 auto; padding: 28px 18px 70px; }
+
+  header { text-align: center; margin-bottom: 22px; }
+  header h1 {
+    font-size: clamp(1.5rem, 4vw, 2.4rem);
+    background: linear-gradient(90deg, #4fc3f7, #b388ff, #f06292);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 10px;
+  }
+  header p { color: var(--muted); font-size: 1.05rem; line-height: 1.6; }
+
+  /* Steps nav */
+  .steps {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 24px 0;
+    flex-wrap: wrap;
+  }
+  .step-btn {
+    background: var(--card);
+    border: 2px solid transparent;
+    color: var(--text);
+    border-radius: 12px;
+    padding: 10px 18px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .step-btn:hover { transform: translateY(-2px); }
+  .step-btn.active { border-color: var(--accent); background: rgba(79,195,247,0.15); }
+
+  .panel {
+    display: none;
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 18px;
+    padding: 26px 22px;
+    animation: fadeIn .4s;
+  }
+  .panel.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
+
+  .panel h2 { font-size: 1.4rem; margin-bottom: 8px; }
+  .panel .explain { color: var(--muted); line-height: 1.8; margin-bottom: 20px; font-size: 1.05rem; }
+
+  /* The sentence display */
+  .sentence-box {
+    background: rgba(0,0,0,0.3);
+    border-radius: 14px;
+    padding: 22px;
+    font-size: clamp(1.3rem, 3.5vw, 1.9rem);
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 20px;
+    line-height: 1.7;
+    min-height: 80px;
+  }
+  .blank {
+    display: inline-block;
+    min-width: 90px;
+    border-bottom: 3px dashed var(--accent);
+    color: var(--accent);
+    animation: blink 1.2s infinite;
+  }
+  @keyframes blink { 50% { opacity: 0.35; } }
+  .chosen-word { color: var(--green); }
+  .new-word { color: var(--accent); animation: pop .4s; }
+  @keyframes pop { 0% { transform: scale(1.6); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+  /* Probability bars */
+  .bars { display: flex; flex-direction: column; gap: 12px; margin-bottom: 18px; }
+  .bar-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    border-radius: 10px;
+    padding: 6px 8px;
+    transition: background .2s;
+  }
+  .bar-row:hover { background: rgba(255,255,255,0.08); }
+  .bar-row.winner { background: rgba(102,187,106,0.15); outline: 2px solid var(--green); }
+  .bar-word { min-width: 110px; font-size: 1.15rem; font-weight: 700; text-align: left; }
+  .bar-track {
+    flex: 1;
+    height: 30px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    width: 0;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #4fc3f7, #2196f3);
+    transition: width 1s ease;
+  }
+  .bar-row:nth-child(2) .bar-fill { background: linear-gradient(90deg, #ffa726, #fb8c00); }
+  .bar-row:nth-child(3) .bar-fill { background: linear-gradient(90deg, #f06292, #ec407a); }
+  .bar-row:nth-child(4) .bar-fill { background: linear-gradient(90deg, #b388ff, #9575cd); }
+  .bar-row:nth-child(5) .bar-fill { background: linear-gradient(90deg, #66bb6a, #43a047); }
+  .bar-pct { min-width: 56px; font-weight: 800; font-size: 1.1rem; color: var(--accent); }
+
+  .note {
+    background: rgba(79,195,247,0.1);
+    border-right: 4px solid var(--accent);
+    border-radius: 8px;
+    padding: 12px 16px;
+    color: var(--text);
+    line-height: 1.7;
+    margin-top: 14px;
+  }
+  .note.green { border-right-color: var(--green); background: rgba(102,187,106,0.1); }
+
+  button.action {
+    background: linear-gradient(90deg, #2196f3, #4fc3f7);
+    border: none;
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 700;
+    padding: 12px 28px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform .15s, box-shadow .15s;
+    display: block;
+    margin: 0 auto;
+  }
+  button.action:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(33,150,243,0.4); }
+  button.action:disabled { opacity: 0.4; cursor: default; transform: none; box-shadow: none; }
+  .btn-row { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+  .btn-row button.action { margin: 0; }
+  button.action.secondary { background: rgba(255,255,255,0.12); }
+
+  /* Corpus */
+  .corpus {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+  .corpus .line {
+    background: rgba(0,0,0,0.25);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 1rem;
+    transition: all .3s;
+    border: 1px solid transparent;
+  }
+  .corpus .line.match {
+    background: rgba(102,187,106,0.18);
+    border-color: var(--green);
+    transform: scale(1.03);
+  }
+  .corpus .line.dim { opacity: 0.3; }
+  .corpus .line .hl { color: var(--green); font-weight: 800; }
+  .corpus .line .next-word { color: var(--orange); font-weight: 800; }
+
+  .tally {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin: 16px 0;
+  }
+  .tally .t-item {
+    background: rgba(0,0,0,0.3);
+    border-radius: 12px;
+    padding: 12px 20px;
+    text-align: center;
+    min-width: 110px;
+  }
+  .tally .t-word { font-size: 1.2rem; font-weight: 800; color: var(--orange); }
+  .tally .t-count { font-size: 1.6rem; font-weight: 800; }
+  .tally .t-pct { color: var(--accent); font-weight: 700; }
+
+  /* Temperature slider */
+  .temp-box {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    justify-content: center;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+  .temp-box label { font-weight: 700; }
+  .temp-box input { width: 200px; accent-color: var(--pink); }
+  .temp-val { color: var(--pink); font-weight: 800; min-width: 70px; }
+
+  footer { text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 26px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🤖 איך מודל שפה עובד?</h1>
+    <p>הסוד הגדול של ChatGPT וחבריו פשוט להפתיע:<br><b>מודל שפה הוא מכונה שמנחשת את המילה הבאה — שוב ושוב.</b></p>
+  </header>
+
+  <div class="steps">
+    <button class="step-btn active" data-step="1">1️⃣ הניחוש</button>
+    <button class="step-btn" data-step="2">2️⃣ מאיפה המספרים?</button>
+    <button class="step-btn" data-step="3">3️⃣ בונים משפט!</button>
+  </div>
+
+  <!-- STEP 1 -->
+  <section class="panel active" id="panel1">
+    <h2>שלב 1: לנחש את המילה הבאה</h2>
+    <p class="explain">
+      נתחיל ממשפט אחד שלא הסתיים. המודל לא "יודע" מה המילה הבאה —
+      הוא מחשב <b>הסתברות</b>: לכל מילה אפשרית הוא נותן ציון של "כמה סביר שהיא תבוא עכשיו".
+    </p>
+
+    <div class="sentence-box" id="s1box">הילד הלך <span class="blank">___</span></div>
+
+    <button class="action" id="s1btn">🎲 מה המילה הבאה?</button>
+
+    <div class="bars" id="s1bars" style="margin-top:18px"></div>
+    <div id="s1note"></div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="panel" id="panel2">
+    <h2>שלב 2: מאיפה ההסתברויות? מִסְפִירָה!</h2>
+    <p class="explain">
+      המודל "קרא" המון המון טקסטים (אצלנו — רק 14 משפטים, אצל ChatGPT — מיליארדי דפים).
+      כדי לדעת מה בא אחרי <b>"הילד הלך"</b>, הוא פשוט בודק: בכל הטקסטים שקראתי,
+      <b>מה הופיע שם בדרך כלל?</b>
+    </p>
+
+    <div class="corpus" id="corpus"></div>
+
+    <button class="action" id="s2btn">🔍 חפש "הילד הלך" וספור</button>
+
+    <div class="tally" id="tally"></div>
+    <div id="s2note"></div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="panel" id="panel3">
+    <h2>שלב 3: בונים משפט שלם — מילה אחר מילה</h2>
+    <p class="explain">
+      עכשיו הקסם: חוזרים על הניחוש שוב ושוב. כל מילה שנבחרה מצטרפת למשפט,
+      והמודל מנחש את הבאה אחריה. ככה בדיוק נכתבת כל תשובה של ChatGPT!
+      <br>אפשר גם לשלוט ב"מצב הרוח" של המודל 👇
+    </p>
+
+    <div class="temp-box">
+      <label>🌡️ יצירתיות:</label>
+      <input type="range" id="temp" min="0.3" max="2" step="0.1" value="1">
+      <span class="temp-val" id="tempVal">רגיל</span>
+    </div>
+
+    <div class="sentence-box" id="s3box"><span class="blank">לחצו על הכפתור...</span></div>
+
+    <div class="btn-row">
+      <button class="action" id="s3btn">✨ המילה הבאה</button>
+      <button class="action secondary" id="s3reset">🔄 משפט חדש</button>
+    </div>
+
+    <div class="bars" id="s3bars" style="margin-top:18px"></div>
+    <div id="s3note"></div>
+  </section>
+
+  <footer>הדגמה חינוכית · כל ה"מודל" כאן הוא ספירת מילים מ-14 משפטים — אותו עיקרון, בקטן 🙂</footer>
+</div>
+
+<script>
+/* ---------- The "training data": 14 simple sentences ---------- */
+const CORPUS = [
+  'הילד הלך לבית הספר',
+  'הילד הלך לבית של סבתא',
+  'הילד הלך לבית הכנסת',
+  'הילד הלך לגן השעשועים',
+  'הילד הלך לגן החיות',
+  'הילד הלך לחנות הצעצועים',
+  'הילד אכל גלידה טעימה',
+  'הילדה אכלה תפוח מתוק',
+  'הילדה שתתה מיץ תפוחים',
+  'הכלב רץ בגינה הגדולה',
+  'הכלב רץ אחרי החתול',
+  'החתול ישן על הספה',
+  'אמא הכינה עוגה טעימה',
+  'אבא קרא ספר מעניין'
+];
+
+const END = '◼';
+
+/* Build a simple bigram model: word -> { nextWord: count } */
+const model = {};
+const starts = {};
+CORPUS.forEach(s => {
+  const w = s.split(' ');
+  starts[w[0]] = (starts[w[0]] || 0) + 1;
+  for (let i = 0; i < w.length; i++) {
+    const cur = w[i], nxt = w[i + 1] || END;
+    model[cur] = model[cur] || {};
+    model[cur][nxt] = (model[cur][nxt] || 0) + 1;
+  }
+});
+
+function candidates(word, temp = 1) {
+  const counts = word === null ? starts : (model[word] || {});
+  const entries = Object.entries(counts);
+  if (!entries.length) return [];
+  // apply "temperature": low temp sharpens, high temp flattens
+  const weighted = entries.map(([w, c]) => [w, Math.pow(c, 1 / temp)]);
+  const total = weighted.reduce((a, [, v]) => a + v, 0);
+  return weighted
+    .map(([w, v]) => ({ word: w, p: v / total }))
+    .sort((a, b) => b.p - a.p);
+}
+
+function sample(cands) {
+  let r = Math.random();
+  for (const c of cands) { r -= c.p; if (r <= 0) return c; }
+  return cands[cands.length - 1];
+}
+
+function renderBars(container, cands, onPick) {
+  container.innerHTML = '';
+  cands.slice(0, 5).forEach(c => {
+    const row = document.createElement('div');
+    row.className = 'bar-row';
+    row.dataset.word = c.word;
+    const label = c.word === END ? '(סוף המשפט)' : c.word;
+    row.innerHTML = `
+      <div class="bar-word">${label}</div>
+      <div class="bar-track"><div class="bar-fill"></div></div>
+      <div class="bar-pct">${Math.round(c.p * 100)}%</div>`;
+    if (onPick) row.addEventListener('click', () => onPick(c));
+    container.appendChild(row);
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        row.querySelector('.bar-fill').style.width = (c.p * 100) + '%';
+      }));
+  });
+}
+
+/* ---------- Step navigation ---------- */
+document.querySelectorAll('.step-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.step-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel' + btn.dataset.step).classList.add('active');
+  });
+});
+
+/* ---------- STEP 1 ---------- */
+const s1btn = document.getElementById('s1btn');
+s1btn.addEventListener('click', () => {
+  s1btn.disabled = true;
+  const cands = candidates('הלך');
+  renderBars(document.getElementById('s1bars'), cands, pick => {
+    document.getElementById('s1box').innerHTML =
+      `הילד הלך <span class="chosen-word">${pick.word}</span>`;
+    document.querySelectorAll('#s1bars .bar-row').forEach(r =>
+      r.classList.toggle('winner', r.dataset.word === pick.word));
+    document.getElementById('s1note').innerHTML = `
+      <div class="note green">
+        בחרתם את <b>"${pick.word}"</b> (${Math.round(pick.p * 100)}%).
+        שימו לב: גם מילים עם הסתברות נמוכה יכולות להיבחר — לכן המודל לא תמיד עונה אותו דבר!
+        <br>👈 עברו לשלב 2 כדי לגלות מאיפה המספרים האלה הגיעו.
+      </div>`;
+  });
+  document.getElementById('s1note').innerHTML = `
+    <div class="note">
+      אלו הניחושים של המודל, מסודרים לפי הסתברות.
+      <b>לחצו על אחת המילים</b> כדי להשלים את המשפט.
+    </div>`;
+});
+
+/* ---------- STEP 2 ---------- */
+const corpusEl = document.getElementById('corpus');
+CORPUS.forEach(s => {
+  const div = document.createElement('div');
+  div.className = 'line';
+  div.textContent = s;
+  corpusEl.appendChild(div);
+});
+
+const s2btn = document.getElementById('s2btn');
+s2btn.addEventListener('click', async () => {
+  s2btn.disabled = true;
+  const lines = [...corpusEl.children];
+  const counts = {};
+  let matches = 0;
+
+  for (let i = 0; i < lines.length; i++) {
+    const s = CORPUS[i];
+    const line = lines[i];
+    await new Promise(r => setTimeout(r, 350));
+    if (s.startsWith('הילד הלך ')) {
+      matches++;
+      const next = s.split(' ')[2];
+      counts[next] = (counts[next] || 0) + 1;
+      line.classList.add('match');
+      line.innerHTML = `<span class="hl">הילד הלך</span> <span class="next-word">${next}</span> ` +
+        s.split(' ').slice(3).join(' ');
+      renderTally(counts, matches, false);
+    } else {
+      line.classList.add('dim');
+    }
+  }
+  renderTally(counts, matches, true);
+  document.getElementById('s2note').innerHTML = `
+    <div class="note green">
+      זהו כל הסוד! מתוך ${matches} משפטים שמתחילים ב"הילד הלך" —
+      ספרנו מה בא אחר כך והפכנו לאחוזים.
+      <b>אלה בדיוק המספרים שראיתם בשלב 1.</b>
+      ChatGPT עושה את אותו הדבר, רק עם מיליארדי משפטים ועם זיכרון של כל המשפט (לא רק שתי מילים).
+    </div>`;
+});
+
+function renderTally(counts, total, showPct) {
+  const el = document.getElementById('tally');
+  el.innerHTML = '';
+  Object.entries(counts).sort((a, b) => b[1] - a[1]).forEach(([w, c]) => {
+    const d = document.createElement('div');
+    d.className = 't-item';
+    d.innerHTML = `<div class="t-word">${w}</div>
+      <div class="t-count">${'✔'.repeat(c)}</div>
+      <div class="t-pct">${showPct ? Math.round(c / total * 100) + '%' : c + ' פעמים'}</div>`;
+    el.appendChild(d);
+  });
+}
+
+/* ---------- STEP 3 ---------- */
+let sentence = [];
+let finished = false;
+const s3box = document.getElementById('s3box');
+const s3btn = document.getElementById('s3btn');
+const s3bars = document.getElementById('s3bars');
+const s3note = document.getElementById('s3note');
+const tempInput = document.getElementById('temp');
+const tempVal = document.getElementById('tempVal');
+
+tempInput.addEventListener('input', () => {
+  const t = +tempInput.value;
+  tempVal.textContent = t < 0.7 ? 'שמרני 😐' : t <= 1.3 ? 'רגיל 🙂' : 'יצירתי 🤪';
+});
+
+function renderSentence(newWord) {
+  if (!sentence.length) {
+    s3box.innerHTML = '<span class="blank">לחצו על הכפתור...</span>';
+    return;
+  }
+  s3box.innerHTML = sentence
+    .map((w, i) => (i === sentence.length - 1 && newWord)
+      ? `<span class="new-word">${w}</span>` : w)
+    .join(' ') + (finished ? '<span class="chosen-word">.</span>' : ' <span class="blank">___</span>');
+}
+
+s3btn.addEventListener('click', () => {
+  if (finished) return;
+  const temp = +tempInput.value;
+  const prev = sentence.length ? sentence[sentence.length - 1] : null;
+  const cands = candidates(prev, temp);
+  renderBars(s3bars, cands);
+  s3btn.disabled = true;
+
+  setTimeout(() => {
+    const pick = sample(cands);
+    [...s3bars.children].forEach(r =>
+      r.classList.toggle('winner', r.dataset.word === pick.word));
+    setTimeout(() => {
+      if (pick.word === END) {
+        finished = true;
+        renderSentence(false);
+        s3note.innerHTML = `
+          <div class="note green">
+            🎉 המודל החליט לסיים את המשפט: <b>"${sentence.join(' ')}"</b>.
+            לחצו "משפט חדש" ונסו שוב — בגלל ההסתברות, כמעט תמיד ייצא משפט אחר!
+          </div>`;
+      } else {
+        sentence.push(pick.word);
+        renderSentence(true);
+        s3note.innerHTML = `
+          <div class="note">
+            נבחרה <b>"${pick.word}"</b> (${Math.round(pick.p * 100)}%). המשיכו ללחוץ ✨
+          </div>`;
+      }
+      s3btn.disabled = false;
+    }, 900);
+  }, 1100);
+});
+
+document.getElementById('s3reset').addEventListener('click', () => {
+  sentence = [];
+  finished = false;
+  s3bars.innerHTML = '';
+  s3note.innerHTML = '';
+  s3btn.disabled = false;
+  renderSentence(false);
+});
+</script>
+</body>
+</html>
