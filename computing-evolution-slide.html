@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>התפתחות המחשוב: 1985 ועד היום</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-dark: #0b1026;
+    --bg-card: rgba(255,255,255,0.06);
+    --accent: #4fc3f7;
+    --text: #eaf2ff;
+    --muted: #9fb3d1;
+  }
+
+  body {
+    font-family: 'Segoe UI', 'Heebo', Arial, sans-serif;
+    background: radial-gradient(ellipse at top, #1b2a5e 0%, var(--bg-dark) 60%);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .slide {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 20px 60px;
+  }
+
+  header { text-align: center; margin-bottom: 24px; }
+
+  header h1 {
+    font-size: clamp(1.6rem, 4vw, 2.6rem);
+    background: linear-gradient(90deg, #4fc3f7, #b388ff, #ff8a65);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+
+  header p { color: var(--muted); font-size: 1.05rem; }
+
+  /* Era filter buttons */
+  .eras {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin: 22px 0 30px;
+  }
+
+  .era-btn {
+    border: 2px solid transparent;
+    border-radius: 999px;
+    padding: 8px 18px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: #fff;
+    transition: transform .15s, box-shadow .15s, opacity .15s;
+    opacity: 0.85;
+  }
+  .era-btn:hover { transform: translateY(-2px); }
+  .era-btn.active { border-color: #fff; opacity: 1; box-shadow: 0 0 18px rgba(255,255,255,0.25); }
+
+  .era-all   { background: #455a64; }
+  .era-pc    { background: #1976d2; }
+  .era-web   { background: #2e7d32; }
+  .era-mobile{ background: #ef6c00; }
+  .era-cloud { background: #6a1b9a; }
+  .era-ai    { background: #c62828; }
+
+  /* Timeline */
+  .timeline {
+    position: relative;
+    padding-right: 34px;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    right: 12px;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    border-radius: 2px;
+    background: linear-gradient(180deg, #1976d2, #2e7d32, #ef6c00, #6a1b9a, #c62828);
+  }
+
+  .event {
+    position: relative;
+    margin-bottom: 14px;
+    background: var(--bg-card);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    cursor: pointer;
+    transition: transform .2s, background .2s, border-color .2s, opacity .3s;
+    overflow: hidden;
+  }
+  .event:hover {
+    transform: translateX(-6px);
+    background: rgba(255,255,255,0.1);
+    border-color: var(--accent);
+  }
+  .event.hidden { display: none; }
+
+  .event::before {
+    content: '';
+    position: absolute;
+    right: -28px;
+    top: 26px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--dot, var(--accent));
+    box-shadow: 0 0 10px var(--dot, var(--accent));
+  }
+
+  .event-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+  }
+
+  .event-year {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--dot, var(--accent));
+    min-width: 70px;
+    text-align: center;
+  }
+
+  .event-icon { font-size: 1.7rem; }
+
+  .event-title { font-size: 1.1rem; font-weight: 700; flex: 1; }
+
+  .event-arrow {
+    color: var(--muted);
+    transition: transform .25s;
+    font-size: 0.9rem;
+  }
+  .event.open .event-arrow { transform: rotate(90deg); }
+
+  .event-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .35s ease, padding .35s ease;
+    padding: 0 18px;
+    color: var(--muted);
+    line-height: 1.7;
+    font-size: 1rem;
+  }
+  .event.open .event-body {
+    max-height: 320px;
+    padding: 0 18px 18px;
+  }
+
+  .badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+    color: #fff;
+    background: var(--dot, var(--accent));
+  }
+
+  /* Footer controls */
+  .controls {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 28px;
+  }
+  .controls button {
+    background: var(--bg-card);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: var(--text);
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background .2s;
+  }
+  .controls button:hover { background: rgba(255,255,255,0.15); }
+
+  .hint { text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 14px; }
+
+  /* Counter strip */
+  .stats {
+    display: flex;
+    justify-content: center;
+    gap: 26px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+  .stat { text-align: center; }
+  .stat .num { font-size: 1.6rem; font-weight: 800; color: var(--accent); }
+  .stat .lbl { font-size: 0.85rem; color: var(--muted); }
+
+  @media (max-width: 600px) {
+    .event-header { flex-wrap: wrap; gap: 8px; padding: 12px 14px; }
+    .event-year { min-width: 56px; font-size: 1.05rem; }
+  }
+</style>
+</head>
+<body>
+<div class="slide">
+  <header>
+    <h1>💻 התפתחות המחשוב: מ-1985 ועד היום</h1>
+    <p>מכניסת המחשב האישי, דרך מהפכת האינטרנט והמובייל — ועד עידן הבינה המלאכותית</p>
+  </header>
+
+  <div class="stats">
+    <div class="stat"><div class="num" id="statYears">40</div><div class="lbl">שנות חדשנות</div></div>
+    <div class="stat"><div class="num" id="statEvents">0</div><div class="lbl">אבני דרך</div></div>
+    <div class="stat"><div class="num">5</div><div class="lbl">תקופות</div></div>
+  </div>
+
+  <div class="eras" id="eras">
+    <button class="era-btn era-all active" data-era="all">הכול</button>
+    <button class="era-btn era-pc" data-era="pc">🖥️ עידן ה-PC</button>
+    <button class="era-btn era-web" data-era="web">🌐 עידן האינטרנט</button>
+    <button class="era-btn era-mobile" data-era="mobile">📱 עידן המובייל</button>
+    <button class="era-btn era-cloud" data-era="cloud">☁️ עידן הענן</button>
+    <button class="era-btn era-ai" data-era="ai">🤖 עידן ה-AI</button>
+  </div>
+
+  <div class="timeline" id="timeline"></div>
+
+  <div class="controls">
+    <button id="expandAll">פתח הכול</button>
+    <button id="collapseAll">סגור הכול</button>
+    <button id="playBtn">▶ נגן ציר זמן</button>
+  </div>
+  <p class="hint">לחצו על אירוע כדי לקרוא עוד · ניתן לסנן לפי תקופה · חצים ↑/↓ לניווט ו-Enter לפתיחה</p>
+</div>
+
+<script>
+const ERA_COLORS = {
+  pc: '#1976d2',
+  web: '#2e7d32',
+  mobile: '#ef6c00',
+  cloud: '#6a1b9a',
+  ai: '#c62828'
+};
+const ERA_NAMES = {
+  pc: 'עידן ה-PC',
+  web: 'עידן האינטרנט',
+  mobile: 'עידן המובייל',
+  cloud: 'עידן הענן',
+  ai: 'עידן ה-AI'
+};
+
+const EVENTS = [
+  { year: 1985, era: 'pc', icon: '🪟', title: 'Windows 1.0 ומעבד אינטל 386',
+    desc: 'מיקרוסופט משיקה את Windows 1.0 — הממשק הגרפי הראשון שלה — ואינטל מציגה את מעבד ה-386. המחשב האישי הופך מכלי לחובבים למוצר ביתי ועסקי נפוץ.' },
+  { year: 1989, era: 'web', icon: '🕸️', title: 'טים ברנרס-לי ממציא את ה-World Wide Web',
+    desc: 'במעבדות CERN בשווייץ, טים ברנרס-לי מציע את רעיון ה-WWW: דפי היפרטקסט המקושרים זה לזה. ההמצאה שתשנה את העולם נולדת.' },
+  { year: 1991, era: 'web', icon: '🐧', title: 'האינטרנט נפתח לציבור + לינוקס',
+    desc: 'האתר הראשון בעולם עולה לאוויר, וסטודנט פיני בשם לינוס טורבאלדס משחרר את גרסת הלינוקס הראשונה — תחילתה של מהפכת הקוד הפתוח.' },
+  { year: 1993, era: 'web', icon: '🧭', title: 'דפדפן Mosaic — האינטרנט לכולם',
+    desc: 'Mosaic הוא הדפדפן הגרפי הראשון שזוכה לפופולריות המונית. בפעם הראשונה, גלישה באינטרנט אינה דורשת ידע טכני.' },
+  { year: 1995, era: 'web', icon: '🚀', title: 'Windows 95, אמזון ו-eBay',
+    desc: 'Windows 95 מושק עם כפתור Start ותמיכה מובנית באינטרנט. אמזון ו-eBay נפתחות — המסחר האלקטרוני יוצא לדרך. שפת Java ו-JavaScript נולדות באותה שנה.' },
+  { year: 1998, era: 'web', icon: '🔍', title: 'גוגל נוסדת',
+    desc: 'לארי פייג\' וסרגיי ברין מקימים את גוגל בחניה בקליפורניה. מנוע החיפוש החדש מסדר את הכאוס של הרשת ומשנה את הדרך שבה אנחנו מוצאים מידע.' },
+  { year: 2000, era: 'web', icon: '📉', title: 'התפוצצות בועת הדוט-קום',
+    desc: 'בועת מניות האינטרנט מתפוצצת ומוחקת טריליוני דולרים. החברות ששרדו — אמזון, גוגל, eBay — יהפכו לענקיות של העשור הבא.' },
+  { year: 2004, era: 'web', icon: '👥', title: 'פייסבוק ועידן הרשתות החברתיות',
+    desc: 'מארק צוקרברג משיק את פייסבוק מהמעונות בהרווארד. יחד עם Gmail ועליית ה-Web 2.0, האינטרנט הופך מקריאה בלבד לרשת חברתית ושיתופית.' },
+  { year: 2006, era: 'cloud', icon: '☁️', title: 'AWS — מהפכת מחשוב הענן',
+    desc: 'אמזון משיקה את Amazon Web Services. במקום לקנות שרתים, חברות שוכרות כוח מחשוב לפי דרישה — המודל שעליו בנוי האינטרנט המודרני כולו.' },
+  { year: 2007, era: 'mobile', icon: '📱', title: 'סטיב ג\'ובס מציג את האייפון',
+    desc: '"טלפון, נגן מוזיקה ומכשיר אינטרנט — במכשיר אחד". האייפון ממציא מחדש את הטלפון ומכניס מחשב עוצמתי לכיס של כל אדם.' },
+  { year: 2008, era: 'mobile', icon: '🤖', title: 'אנדרואיד וחנויות האפליקציות',
+    desc: 'גוגל משיקה את אנדרואיד ואפל פותחת את ה-App Store. כלכלת האפליקציות נולדת — ווטסאפ, אינסטגרם, אובר ועוד ישנו את חיי היומיום.' },
+  { year: 2010, era: 'mobile', icon: '📲', title: 'אייפד והמובייל עוקף את הדסקטופ',
+    desc: 'האייפד יוצר קטגוריה חדשה של מחשוב, אינסטגרם מושקת, והעולם עובר לצריכת תוכן בעיקר מהנייד. הסמארטפון הופך למחשב המרכזי של האנושות.' },
+  { year: 2012, era: 'ai', icon: '🧠', title: 'AlexNet — פריצת הדרך של הלמידה העמוקה',
+    desc: 'רשת נוירונים בשם AlexNet מנצחת בתחרות זיהוי תמונות בפער עצום בזכות מעבדי GPU. מהפכת הלמידה העמוקה (Deep Learning) יוצאת לדרך.' },
+  { year: 2016, era: 'ai', icon: '🏆', title: 'AlphaGo מנצחת את אלוף העולם בגו',
+    desc: 'התוכנה של DeepMind מביסה את לי סדול, אלוף העולם במשחק גו — הישג שמומחים העריכו שיידרשו לו עוד עשורים. העולם מבין ש-AI מתקדם מהר מהצפוי.' },
+  { year: 2020, era: 'cloud', icon: '🏠', title: 'הקורונה מאיצה את המהפכה הדיגיטלית',
+    desc: 'מגפת הקורונה מעבירה את העולם לעבודה ולמידה מרחוק כמעט בן לילה. זום, ענן ושיתוף פעולה דיגיטלי הופכים מתוספת נחמדה לתשתית חיונית.' },
+  { year: 2022, era: 'ai', icon: '💬', title: 'ChatGPT — הבינה המלאכותית פוגשת את ההמונים',
+    desc: 'ChatGPT מגיע ל-100 מיליון משתמשים בחודשיים — המוצר הצומח המהיר בהיסטוריה. בינה מלאכותית יוצרת (Generative AI) הופכת לכלי יומיומי לכל אדם.' },
+  { year: 2023, era: 'ai', icon: '⚡', title: 'מרוץ ה-AI הגדול',
+    desc: 'GPT-4, Claude ו-Gemini מושקים. מודלי שפה גדולים כותבים קוד, מנתחים מסמכים ויוצרים תמונות. אנבידיה הופכת לאחת החברות השוות בעולם בזכות שבבי ה-AI.' },
+  { year: 2025, era: 'ai', icon: '🤝', title: 'עידן הסוכנים החכמים — והיום',
+    desc: 'בינה מלאכותית עוברת מצ\'אט לפעולה: סוכני AI מתכנתים, מתכננים ומבצעים משימות שלמות באופן עצמאי. השאלה כבר אינה "מה ה-AI יודע" אלא "מה ה-AI יכול לעשות עבורנו".' }
+];
+
+const timeline = document.getElementById('timeline');
+
+EVENTS.forEach((ev, i) => {
+  const el = document.createElement('div');
+  el.className = 'event';
+  el.dataset.era = ev.era;
+  el.tabIndex = 0;
+  el.style.setProperty('--dot', ERA_COLORS[ev.era]);
+  el.innerHTML = `
+    <div class="event-header">
+      <div class="event-year">${ev.year}</div>
+      <div class="event-icon">${ev.icon}</div>
+      <div class="event-title">${ev.title}</div>
+      <span class="badge">${ERA_NAMES[ev.era]}</span>
+      <div class="event-arrow">◀</div>
+    </div>
+    <div class="event-body">${ev.desc}</div>`;
+  el.addEventListener('click', () => el.classList.toggle('open'));
+  el.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el.classList.toggle('open'); }
+    if (e.key === 'ArrowDown') { e.preventDefault(); focusNext(el, 1); }
+    if (e.key === 'ArrowUp')   { e.preventDefault(); focusNext(el, -1); }
+  });
+  timeline.appendChild(el);
+});
+
+document.getElementById('statEvents').textContent = EVENTS.length;
+
+function visibleEvents() {
+  return [...timeline.querySelectorAll('.event:not(.hidden)')];
+}
+function focusNext(current, dir) {
+  const list = visibleEvents();
+  const idx = list.indexOf(current);
+  const next = list[idx + dir];
+  if (next) next.focus();
+}
+
+// Era filtering
+document.getElementById('eras').addEventListener('click', e => {
+  const btn = e.target.closest('.era-btn');
+  if (!btn) return;
+  document.querySelectorAll('.era-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const era = btn.dataset.era;
+  timeline.querySelectorAll('.event').forEach(ev => {
+    ev.classList.toggle('hidden', era !== 'all' && ev.dataset.era !== era);
+  });
+});
+
+document.getElementById('expandAll').addEventListener('click', () =>
+  visibleEvents().forEach(ev => ev.classList.add('open')));
+document.getElementById('collapseAll').addEventListener('click', () =>
+  timeline.querySelectorAll('.event').forEach(ev => ev.classList.remove('open')));
+
+// Play mode: opens events one by one
+let playTimer = null;
+const playBtn = document.getElementById('playBtn');
+playBtn.addEventListener('click', () => {
+  if (playTimer) { stopPlay(); return; }
+  timeline.querySelectorAll('.event').forEach(ev => ev.classList.remove('open'));
+  const list = visibleEvents();
+  let i = 0;
+  playBtn.textContent = '⏸ עצור';
+  const step = () => {
+    if (i > 0) list[i - 1].classList.remove('open');
+    if (i >= list.length) { stopPlay(); return; }
+    const ev = list[i++];
+    ev.classList.add('open');
+    ev.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+  step();
+  playTimer = setInterval(step, 3500);
+});
+function stopPlay() {
+  clearInterval(playTimer);
+  playTimer = null;
+  playBtn.textContent = '▶ נגן ציר זמן';
+}
+</script>
+</body>
+</html>
