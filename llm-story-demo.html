@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>איך מודל שפה עונה על שאלה בסיפור?</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0d1330;
+    --card: rgba(255,255,255,0.07);
+    --accent: #4fc3f7;
+    --green: #66bb6a;
+    --orange: #ffa726;
+    --pink: #f06292;
+    --text: #eef4ff;
+    --muted: #a9bcd8;
+  }
+
+  body {
+    font-family: 'Segoe UI', 'Heebo', Arial, sans-serif;
+    background: radial-gradient(ellipse at top, #20306b 0%, var(--bg) 65%);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  .wrap { max-width: 950px; margin: 0 auto; padding: 26px 16px 70px; }
+
+  header { text-align: center; margin-bottom: 18px; }
+  header h1 {
+    font-size: clamp(1.4rem, 4vw, 2.2rem);
+    background: linear-gradient(90deg, #4fc3f7, #b388ff, #f06292);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 10px;
+  }
+  header p { color: var(--muted); font-size: 1.05rem; line-height: 1.7; }
+  header p b { color: var(--text); }
+
+  /* The "how it works" strip */
+  .loop-strip {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    background: var(--card);
+    border-radius: 14px;
+    padding: 12px 16px;
+    margin: 18px 0;
+    font-weight: 700;
+    font-size: 0.98rem;
+  }
+  .loop-strip .chip {
+    background: rgba(0,0,0,0.3);
+    border-radius: 999px;
+    padding: 6px 14px;
+  }
+  .loop-strip .chip.q { border: 1px solid var(--accent); }
+  .loop-strip .chip.a { border: 1px solid var(--orange); }
+  .loop-strip .chip.n { border: 1px solid var(--green); color: var(--green); }
+  .loop-strip .arrow { color: var(--muted); }
+
+  /* Chat area */
+  .chat {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 18px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .bubble {
+    max-width: 85%;
+    border-radius: 16px;
+    padding: 14px 18px;
+    line-height: 2;
+    font-size: 1.15rem;
+    margin-bottom: 14px;
+  }
+  .bubble .who {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-bottom: 4px;
+    font-weight: 700;
+  }
+  .bubble.user {
+    background: linear-gradient(135deg, #1565c0, #1e88e5);
+    margin-right: auto;
+  }
+  .bubble.model {
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.12);
+    margin-left: auto;
+    min-height: 60px;
+  }
+  .bubble.user .w.reading {
+    background: var(--accent);
+    color: #06243a;
+    border-radius: 4px;
+  }
+  .w { padding: 0 2px; border-radius: 4px; transition: background .2s; }
+  .w.fresh { color: var(--accent); animation: pop .35s; font-weight: 700; }
+  @keyframes pop { 0% { transform: scale(1.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+  .cursor {
+    display: inline-block;
+    width: 10px; height: 1.2em;
+    background: var(--accent);
+    vertical-align: text-bottom;
+    animation: blink 0.8s infinite;
+    border-radius: 2px;
+  }
+  @keyframes blink { 50% { opacity: 0.1; } }
+
+  .phase-label {
+    text-align: center;
+    color: var(--orange);
+    font-weight: 800;
+    min-height: 28px;
+    margin-bottom: 10px;
+    font-size: 1.05rem;
+  }
+
+  /* Brain panel */
+  .brain {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 18px;
+    padding: 18px 20px;
+  }
+  .brain h3 { margin-bottom: 12px; font-size: 1.1rem; }
+  .brain h3 .ctx { color: var(--muted); font-weight: 400; font-size: 0.92rem; }
+  .bars { display: flex; flex-direction: column; gap: 10px; min-height: 130px; }
+  .bar-row {
+    display: flex; align-items: center; gap: 12px;
+    border-radius: 10px; padding: 4px 8px;
+    transition: background .2s, outline .2s;
+  }
+  .bar-row.winner { background: rgba(102,187,106,0.15); outline: 2px solid var(--green); }
+  .bar-word { min-width: 150px; font-size: 1.05rem; font-weight: 700; text-align: left; }
+  .bar-track { flex: 1; height: 26px; background: rgba(255,255,255,0.08); border-radius: 8px; overflow: hidden; }
+  .bar-fill { height: 100%; width: 0; border-radius: 8px; background: linear-gradient(90deg, #4fc3f7, #2196f3); transition: width .6s ease; }
+  .bar-row:nth-child(2) .bar-fill { background: linear-gradient(90deg, #ffa726, #fb8c00); }
+  .bar-row:nth-child(3) .bar-fill { background: linear-gradient(90deg, #f06292, #ec407a); }
+  .bar-pct { min-width: 52px; font-weight: 800; color: var(--accent); }
+  .brain .idle { color: var(--muted); text-align: center; padding: 40px 0; }
+
+  /* Controls */
+  .controls {
+    display: flex; justify-content: center; align-items: center;
+    gap: 14px; flex-wrap: wrap; margin: 18px 0;
+  }
+  button.action {
+    background: linear-gradient(90deg, #2196f3, #4fc3f7);
+    border: none; color: #fff;
+    font-size: 1.1rem; font-weight: 700;
+    padding: 12px 28px; border-radius: 12px; cursor: pointer;
+    transition: transform .15s, box-shadow .15s;
+  }
+  button.action:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(33,150,243,0.4); }
+  button.action:disabled { opacity: 0.4; cursor: default; transform: none; box-shadow: none; }
+  button.action.again { background: linear-gradient(90deg, #43a047, #66bb6a); }
+  .speed-box { display: flex; align-items: center; gap: 8px; font-weight: 700; }
+  .speed-box input { width: 130px; accent-color: var(--pink); }
+
+  .note {
+    background: rgba(102,187,106,0.1);
+    border-right: 4px solid var(--green);
+    border-radius: 8px;
+    padding: 14px 16px;
+    line-height: 1.8;
+    margin-top: 14px;
+    display: none;
+  }
+  .note b { color: var(--green); }
+
+  footer { text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 24px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>📖 שאלנו שאלה — וקיבלנו סיפור. איך?</h1>
+    <p>
+      המודל <b>לא מחפש תשובה במאגר</b> ולא "מבין" כמונו.
+      השאלה שלכם הופכת לתחילתו של טקסט — והמודל פשוט <b>ממשיך אותו, מילה אחר מילה</b>,
+      בדיוק כמו שראינו בהדגמה הקודמת. כך נולד סיפור שלם.
+    </p>
+  </header>
+
+  <div class="loop-strip">
+    <span class="chip q">השאלה שלכם</span>
+    <span class="arrow">+</span>
+    <span class="chip a">התשובה עד כה</span>
+    <span class="arrow">⬅</span>
+    <span class="chip n">ניחוש המילה הבאה</span>
+    <span class="arrow">🔁 ושוב, ושוב...</span>
+  </div>
+
+  <div class="phase-label" id="phase"></div>
+
+  <div class="chat">
+    <div class="bubble user">
+      <span class="who">👤 אתם</span>
+      <span id="qwords"></span>
+    </div>
+    <div class="bubble model">
+      <span class="who">🤖 המודל</span>
+      <span id="answer"><span style="color:var(--muted)">לחצו על "שאל את השאלה" כדי להתחיל...</span></span>
+    </div>
+  </div>
+
+  <div class="brain">
+    <h3>🧠 הצצה למוח של המודל <span class="ctx">— הניחושים למילה הבאה, בזמן אמת</span></h3>
+    <div class="bars" id="bars"><div class="idle">כאן תראו את ההסתברויות בזמן שהמודל כותב</div></div>
+  </div>
+
+  <div class="controls">
+    <button class="action" id="askBtn">💬 שאל את השאלה</button>
+    <button class="action again" id="againBtn" style="display:none">🔄 שאל שוב את אותה שאלה</button>
+    <div class="speed-box">
+      <span>🐢</span><input type="range" id="speed" min="0.4" max="2.5" step="0.1" value="1"><span>🐇</span>
+    </div>
+  </div>
+
+  <div class="note" id="endNote"></div>
+
+  <footer>הדגמה חינוכית · הסיפור נבנה מהסתברויות, לכן כל שאילה נותנת סיפור קצת אחר</footer>
+</div>
+
+<script>
+const QUESTION = 'ספר לי סיפור קצר על ילד שמצא כלב';
+
+/* The story "model": fixed word runs + real branch points with probabilities.
+   At every branch the demo samples randomly, so each run tells a different story. */
+const W = text => ({ type: 'w', words: text.split(' ') });
+const B = opts => ({ type: 'b', opts: opts.map(([text, p]) => ({ text, p, words: text.split(' ') })) });
+
+const STORY = [
+  W('היה היה ילד קטן בשם'),
+  B([['יוני', 0.5], ['דני', 0.3], ['תום', 0.2]]),
+  W('שאהב מאוד לשחק בחצר.'),
+  B([['יום אחד', 0.6], ['בוקר אחד', 0.4]]),
+  W('הוא שמע קול נביחה חלש'),
+  B([['מאחורי הגדר.', 0.5], ['מתחת לעץ הגדול.', 0.5]]),
+  W('הוא התקרב בשקט, הציץ — וגילה'),
+  B([['כלבלב קטן ורועד', 0.55], ['גור כלבים חום ועצוב', 0.45]]),
+  W('שהביט בו בעיניים גדולות.'),
+  B([
+    ['הילד רץ הביתה, הביא קערת מים ופרוסת לחם, והכלב כשכש בזנבו בשמחה.', 0.6],
+    ['הילד ליטף אותו בעדינות, והכלב ליקק את ידו הקטנה.', 0.4]
+  ]),
+  W('מאותו יום הם היו'),
+  B([['חברים הכי טובים בעולם,', 0.7], ['בלתי נפרדים,', 0.3]]),
+  W('והילד למד שחברות אמיתית מתחילה במעשה טוב אחד קטן. הסוף.')
+];
+
+/* Plausible-looking distractors for regular (non-branch) words */
+const DISTRACTORS = ['חתול', 'הבית', 'השמש', 'ילדה', 'רץ', 'אכל', 'גדול', 'שמח', 'לאט', 'פתאום', 'העץ', 'אמא'];
+
+const qwordsEl = document.getElementById('qwords');
+const answerEl = document.getElementById('answer');
+const barsEl = document.getElementById('bars');
+const phaseEl = document.getElementById('phase');
+const askBtn = document.getElementById('askBtn');
+const againBtn = document.getElementById('againBtn');
+const endNote = document.getElementById('endNote');
+const speedEl = document.getElementById('speed');
+
+const variants = STORY.filter(s => s.type === 'b').reduce((a, s) => a * s.opts.length, 1);
+
+qwordsEl.innerHTML = QUESTION.split(' ').map(w => `<span class="w">${w}</span>`).join(' ');
+
+const delay = ms => new Promise(r => setTimeout(r, ms / +speedEl.value));
+
+function showBars(rows) {
+  barsEl.innerHTML = '';
+  rows.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'bar-row';
+    div.dataset.word = r.word;
+    div.innerHTML = `
+      <div class="bar-word">${r.word}</div>
+      <div class="bar-track"><div class="bar-fill"></div></div>
+      <div class="bar-pct">${Math.round(r.p * 100)}%</div>`;
+    barsEl.appendChild(div);
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      div.querySelector('.bar-fill').style.width = (r.p * 100) + '%';
+    }));
+  });
+}
+
+function markWinner(word) {
+  [...barsEl.children].forEach(r => r.classList.toggle('winner', r.dataset.word === word));
+}
+
+function appendWord(word) {
+  answerEl.querySelectorAll('.w.fresh').forEach(w => w.classList.remove('fresh'));
+  const cur = answerEl.querySelector('.cursor');
+  if (cur) cur.remove();
+  const span = document.createElement('span');
+  span.className = 'w fresh';
+  span.textContent = word;
+  answerEl.appendChild(span);
+  answerEl.appendChild(document.createTextNode(' '));
+  const c = document.createElement('span');
+  c.className = 'cursor';
+  answerEl.appendChild(c);
+}
+
+/* Fake-but-honest bars for a regular word: the real word wins, distractors lose */
+function regularBars(word) {
+  const p1 = 0.7 + Math.random() * 0.25;
+  const rest = 1 - p1;
+  const d = [...DISTRACTORS].sort(() => Math.random() - 0.5).slice(0, 2);
+  const p2 = rest * (0.5 + Math.random() * 0.3);
+  return [
+    { word, p: p1 },
+    { word: d[0], p: p2 },
+    { word: d[1], p: rest - p2 }
+  ];
+}
+
+function samplePick(opts) {
+  let r = Math.random();
+  for (const o of opts) { r -= o.p; if (r <= 0) return o; }
+  return opts[opts.length - 1];
+}
+
+let running = false;
+
+async function run() {
+  if (running) return;
+  running = true;
+  askBtn.disabled = true;
+  againBtn.style.display = 'none';
+  endNote.style.display = 'none';
+  answerEl.innerHTML = '';
+
+  /* Phase 1: read the question */
+  phaseEl.textContent = '👀 שלב 1: המודל קורא את השאלה והופך אותה ל"הקשר"';
+  const qws = qwordsEl.querySelectorAll('.w');
+  for (const w of qws) {
+    w.classList.add('reading');
+    await delay(260);
+    w.classList.remove('reading');
+  }
+  await delay(400);
+
+  /* Phase 2: generate */
+  phaseEl.textContent = '✍️ שלב 2: המודל ממשיך את הטקסט — מילה אחר מילה';
+  for (const seg of STORY) {
+    if (seg.type === 'w') {
+      for (const word of seg.words) {
+        showBars(regularBars(word));
+        await delay(450);
+        markWinner(word);
+        await delay(250);
+        appendWord(word);
+        await delay(150);
+      }
+    } else {
+      phaseEl.textContent = '🤔 רגע של התלבטות... כאן ההסתברויות קרובות, והבחירה אקראית!';
+      showBars(seg.opts.map(o => ({ word: o.text, p: o.p })));
+      await delay(1600);
+      const pick = samplePick(seg.opts);
+      markWinner(pick.text);
+      await delay(800);
+      for (const word of pick.words) {
+        appendWord(word);
+        await delay(220);
+      }
+      phaseEl.textContent = '✍️ שלב 2: המודל ממשיך את הטקסט — מילה אחר מילה';
+    }
+  }
+
+  const cur = answerEl.querySelector('.cursor');
+  if (cur) cur.remove();
+  answerEl.querySelectorAll('.w.fresh').forEach(w => w.classList.remove('fresh'));
+  phaseEl.textContent = '🎉 הסיפור הושלם!';
+  barsEl.innerHTML = '<div class="idle">המודל סיים — אין יותר מילים לנחש</div>';
+  endNote.innerHTML = `
+    <b>מה ראינו כאן?</b> המודל לא "שלף" סיפור מוכן. הוא קיבל את השאלה כהקשר,
+    ובכל צעד ניחש את המילה הבאה לפי הסתברות. ברגעי ה"התלבטות" הבחירה אקראית —
+    ולכן מאותה שאלה בדיוק יכולים לצאת <b>${variants} סיפורים שונים</b>.
+    לחצו "שאל שוב" ותקבלו כמעט בוודאות סיפור אחר! זה בדיוק מה שקורה כששואלים את ChatGPT
+    את אותה שאלה פעמיים.`;
+  endNote.style.display = 'block';
+  againBtn.style.display = '';
+  askBtn.disabled = false;
+  askBtn.style.display = 'none';
+  running = false;
+}
+
+askBtn.addEventListener('click', run);
+againBtn.addEventListener('click', run);
+</script>
+</body>
+</html>

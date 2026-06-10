@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מפת מודלי השפה בעולם</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0d1330;
+    --card: rgba(255,255,255,0.07);
+    --accent: #4fc3f7;
+    --green: #66bb6a;
+    --orange: #ffa726;
+    --pink: #f06292;
+    --text: #eef4ff;
+    --muted: #a9bcd8;
+  }
+
+  body {
+    font-family: 'Segoe UI', 'Heebo', Arial, sans-serif;
+    background: radial-gradient(ellipse at top, #20306b 0%, var(--bg) 65%);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  .wrap { max-width: 1250px; margin: 0 auto; padding: 26px 16px 60px; }
+
+  header { text-align: center; margin-bottom: 22px; }
+  header h1 {
+    font-size: clamp(1.5rem, 4vw, 2.4rem);
+    background: linear-gradient(90deg, #4fc3f7, #b388ff, #f06292);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+  header p { color: var(--muted); font-size: 1.05rem; line-height: 1.6; }
+
+  /* Board of clusters */
+  .board {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .cluster {
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 18px;
+    padding: 14px 16px 18px;
+    transition: transform .25s, box-shadow .25s;
+    position: relative;
+  }
+  .cluster:hover { transform: scale(1.03) rotate(0deg) !important; box-shadow: 0 8px 30px rgba(0,0,0,0.45); z-index: 5; }
+
+  .cluster h3 {
+    font-size: 1rem;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cluster h3 .flag { font-size: 1.2rem; }
+  .cluster h3 .sub { color: var(--muted); font-weight: 400; font-size: 0.8rem; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; max-width: 320px; }
+
+  .chip {
+    border-radius: 999px;
+    padding: 7px 15px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1.5px solid var(--c, var(--accent));
+    background: rgba(0,0,0,0.3);
+    color: var(--text);
+    transition: transform .15s, background .15s, box-shadow .15s;
+    white-space: nowrap;
+  }
+  .chip:hover {
+    background: var(--c, var(--accent));
+    color: #081226;
+    transform: scale(1.12) rotate(0deg) !important;
+    box-shadow: 0 0 16px var(--c, var(--accent));
+    z-index: 6;
+    position: relative;
+  }
+
+  /* China cluster — distinct look */
+  .cluster.china {
+    border: 2px solid #ef5350;
+    background: linear-gradient(160deg, rgba(183,28,28,0.25), rgba(255,160,0,0.08));
+  }
+  .cluster.china h3 { color: #ffab91; }
+
+  /* The two special apps */
+  .specials {
+    display: flex;
+    justify-content: center;
+    gap: 22px;
+    flex-wrap: wrap;
+    margin: 30px 0 10px;
+  }
+  .special {
+    border-radius: 20px;
+    padding: 20px 26px;
+    text-align: center;
+    cursor: pointer;
+    max-width: 340px;
+    border: 2px solid var(--c);
+    background: rgba(0,0,0,0.35);
+    animation: glow 2.2s ease-in-out infinite;
+    transition: transform .2s;
+  }
+  .special:hover { transform: translateY(-5px) scale(1.03); }
+  @keyframes glow {
+    0%, 100% { box-shadow: 0 0 12px var(--c); }
+    50% { box-shadow: 0 0 34px var(--c); }
+  }
+  .special .badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 800;
+    background: var(--c);
+    color: #081226;
+    border-radius: 999px;
+    padding: 3px 12px;
+    margin-bottom: 8px;
+  }
+  .special .name { font-size: 1.45rem; font-weight: 800; margin-bottom: 6px; }
+  .special .desc { color: var(--muted); font-size: 0.95rem; line-height: 1.6; }
+  .special .desc b { color: var(--text); }
+
+  /* Info bar */
+  .info {
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 14px;
+    padding: 14px 18px;
+    margin-top: 22px;
+    min-height: 58px;
+    line-height: 1.7;
+    text-align: center;
+  }
+  .info .placeholder { color: var(--muted); }
+  .info b { color: var(--accent); }
+
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  .legend span { display: flex; align-items: center; gap: 6px; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+
+  footer { text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 22px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🗺️ מפת מודלי השפה בעולם — 2026</h1>
+    <p>כל חברה ומשפחת המודלים שלה · <b style="color:#ffab91">המקבץ הסיני</b> מסומן באדום · לחצו או רחפו על מודל כדי לקרוא עליו</p>
+  </header>
+
+  <div class="board" id="board"></div>
+
+  <div class="specials" id="specials"></div>
+
+  <div class="info" id="info"><span class="placeholder">💡 רחפו או לחצו על כל מודל במפה — ההסבר יופיע כאן</span></div>
+
+  <div class="legend">
+    <span><span class="dot" style="background:#4fc3f7"></span> ארה"ב</span>
+    <span><span class="dot" style="background:#ef5350"></span> סין</span>
+    <span><span class="dot" style="background:#b388ff"></span> אירופה</span>
+    <span><span class="dot" style="background:#66bb6a"></span> ישראל</span>
+    <span><span class="dot" style="background:#ffd54f"></span> ⭐ אפליקציות חכמות (לא מודלים!)</span>
+  </div>
+
+  <footer>שקף הדגמה · התמונה משתנה כל הזמן — מודלים חדשים יוצאים מדי חודש</footer>
+</div>
+
+<script>
+const CLUSTERS = [
+  {
+    company: 'OpenAI', flag: '🇺🇸', sub: 'ארה"ב', color: '#4fc3f7',
+    models: [
+      ['GPT-5.1', 'המודל המתקדם של OpenAI — היורש של GPT-4 שהתחיל את מהפכת ה-AI הציבורית'],
+      ['GPT-4o', 'מודל "אומני" — מבין טקסט, תמונה וקול באותו מוח'],
+      ['o3', 'מודל "חושב" — עוצר לחשוב צעד-צעד לפני שהוא עונה, חזק במתמטיקה ולוגיקה'],
+    ]
+  },
+  {
+    company: 'Anthropic', flag: '🇺🇸', sub: 'ארה"ב', color: '#4fc3f7',
+    models: [
+      ['Claude Opus', 'המודל החזק של אנתרופיק — מצטיין בכתיבה, ניתוח וקוד'],
+      ['Claude Sonnet', 'האיזון המושלם בין מהירות לחוכמה — סוס העבודה הפופולרי'],
+      ['Claude Haiku', 'הקטן והמהיר במשפחה — לתשובות מיידיות'],
+    ]
+  },
+  {
+    company: 'Google', flag: '🇺🇸', sub: 'ארה"ב', color: '#4fc3f7',
+    models: [
+      ['Gemini 2.5 Pro', 'המודל הגדול של גוגל — משולב בחיפוש, ב-Gmail ובאנדרואיד'],
+      ['Gemini Flash', 'הגרסה המהירה והזולה של ג\'מיני'],
+      ['Gemma 3', 'מודל קוד פתוח קטן של גוגל — אפשר להריץ על מחשב ביתי'],
+    ]
+  },
+  {
+    company: 'Meta', flag: '🇺🇸', sub: 'ארה"ב · קוד פתוח', color: '#4fc3f7',
+    models: [
+      ['Llama 4', 'משפחת הקוד הפתוח הגדולה בעולם — כל אחד יכול להוריד ולהתאים'],
+      ['Llama 3.1', 'הדור הקודם — עדיין מניע אלפי מוצרים ברחבי הרשת'],
+    ]
+  },
+  {
+    company: 'xAI · Microsoft · Amazon', flag: '🇺🇸', sub: 'ארה"ב', color: '#4fc3f7',
+    models: [
+      ['Grok 4', 'המודל של אילון מאסק — משולב ברשת X (טוויטר)'],
+      ['Phi-4', 'מודל קטן וחכם של מיקרוסופט — מוכיח שגם קטנים יכולים'],
+      ['Nova', 'משפחת המודלים של אמזון — משולבת בשירותי הענן AWS'],
+    ]
+  },
+  {
+    company: 'Mistral', flag: '🇫🇷', sub: 'צרפת · אירופה', color: '#b388ff',
+    models: [
+      ['Mistral Large', 'הגאווה האירופית — סטארטאפ צרפתי שמתחרה בענקיות'],
+      ['Mixtral', 'מודל "תערובת מומחים" — כמה מוחות קטנים שעובדים יחד'],
+    ]
+  },
+  {
+    company: 'AI21 Labs', flag: '🇮🇱', sub: 'ישראל 🇮🇱', color: '#66bb6a',
+    models: [
+      ['Jamba', 'המודל הישראלי — ארכיטקטורה חדשנית שמשלבת שתי שיטות עיבוד'],
+    ]
+  },
+  {
+    company: 'המקבץ הסיני', flag: '🇨🇳', sub: 'סין — הכוח העולה', color: '#ef5350', china: true,
+    models: [
+      ['DeepSeek-R1', 'הרעידה של 2025 — מודל חושב ברמה עולמית שאומן בעלות נמוכה במפתיע'],
+      ['DeepSeek-V3', 'מודל הדגל של DeepSeek — קוד פתוח וחזק במיוחד'],
+      ['Qwen 3', 'משפחת המודלים של עליבאבא — מהמובילות בעולם בקוד פתוח'],
+      ['Kimi K2', 'המודל של Moonshot — מתמחה במסמכים ארוכים במיוחד'],
+      ['GLM-4', 'המודל של Zhipu AI מאוניברסיטת צינגהואה'],
+      ['Ernie', 'המודל של באידו — "גוגל הסינית"'],
+      ['Hunyuan', 'המודל של טנסנט — ענקית הגיימינג והווי-צ\'אט'],
+      ['Yi', 'המודל של 01.AI — הסטארטאפ של קאי-פו לי'],
+    ]
+  },
+];
+
+const SPECIALS = [
+  {
+    name: 'Perplexity', icon: '🔎', color: '#ffd54f',
+    desc: 'מנוע תשובות: <b>לא מודל בעצמו!</b> אפליקציה שמחפשת ברשת בזמן אמת, ואז נותנת למודלים (GPT, Claude...) לנסח תשובה עם מקורות',
+    info: 'Perplexity הוא "מנוע תשובות" — הוא לא מודל שפה אלא אפליקציה חכמה: הוא מחפש באינטרנט בזמן אמת, אוסף מקורות, ומשתמש במודלים הגדולים כדי לנסח תשובה מדויקת עם הפניות. ההבדל החשוב: המודל הוא המוח, פרפלקסיטי הוא המוצר שעוטף אותו.'
+  },
+  {
+    name: 'NotebookLM', icon: '📓', color: '#80deea',
+    desc: 'העוזר האישי של גוגל למסמכים: <b>גם הוא לא מודל!</b> מעלים אליו קבצים — והוא עונה רק מתוכם, ואפילו מפיק מהם פודקאסט',
+    info: 'NotebookLM של גוגל הוא אפליקציה שבנויה על מודל Gemini: מעלים אליה את המסמכים שלכם (מאמרים, סיכומים, ספרים) — והיא עונה על שאלות רק מתוך החומר שלכם, מסכמת, ואפילו הופכת אותו לשיחת פודקאסט בין שני מגישים. שוב: המודל הוא המוח, האפליקציה היא החוויה.'
+  },
+];
+
+const board = document.getElementById('board');
+const info = document.getElementById('info');
+
+const rand = (min, max) => min + Math.random() * (max - min);
+
+CLUSTERS.forEach(cl => {
+  const el = document.createElement('div');
+  el.className = 'cluster' + (cl.china ? ' china' : '');
+  el.style.transform = `rotate(${rand(-2.5, 2.5)}deg)`;
+  el.innerHTML = `<h3><span class="flag">${cl.flag}</span> ${cl.company} <span class="sub">${cl.sub}</span></h3>
+    <div class="chips"></div>`;
+  const chips = el.querySelector('.chips');
+  cl.models.forEach(([name, desc]) => {
+    const c = document.createElement('div');
+    c.className = 'chip';
+    c.textContent = name;
+    c.style.setProperty('--c', cl.color);
+    c.style.transform = `rotate(${rand(-7, 7)}deg) translateY(${rand(-3, 3)}px)`;
+    const show = () => info.innerHTML = `<b>${name}</b> (${cl.company}) — ${desc}`;
+    c.addEventListener('mouseenter', show);
+    c.addEventListener('click', show);
+    chips.appendChild(c);
+  });
+  board.appendChild(el);
+});
+
+const specials = document.getElementById('specials');
+SPECIALS.forEach(s => {
+  const el = document.createElement('div');
+  el.className = 'special';
+  el.style.setProperty('--c', s.color);
+  el.innerHTML = `<span class="badge">⭐ לא מודל — אפליקציה חכמה</span>
+    <div class="name">${s.icon} ${s.name}</div>
+    <div class="desc">${s.desc}</div>`;
+  const show = () => info.innerHTML = s.info;
+  el.addEventListener('mouseenter', show);
+  el.addEventListener('click', show);
+  specials.appendChild(el);
+});
+</script>
+</body>
+</html>

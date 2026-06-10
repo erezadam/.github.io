@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מה זה Skill? הסבר פשוט</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0d1330;
+    --card: rgba(255,255,255,0.07);
+    --accent: #4fc3f7;
+    --green: #66bb6a;
+    --orange: #ffa726;
+    --pink: #f06292;
+    --red: #ef5350;
+    --text: #eef4ff;
+    --muted: #a9bcd8;
+  }
+
+  body {
+    font-family: 'Segoe UI', 'Heebo', Arial, sans-serif;
+    background: radial-gradient(ellipse at top, #20306b 0%, var(--bg) 65%);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  .wrap { max-width: 950px; margin: 0 auto; padding: 26px 16px 70px; }
+
+  header { text-align: center; margin-bottom: 20px; }
+  header h1 {
+    font-size: clamp(1.5rem, 4vw, 2.3rem);
+    background: linear-gradient(90deg, #4fc3f7, #b388ff, #f06292);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+  header p { color: var(--muted); font-size: 1.05rem; line-height: 1.7; }
+  header p b { color: var(--text); }
+
+  /* Steps nav */
+  .steps { display: flex; justify-content: center; gap: 10px; margin: 22px 0; flex-wrap: wrap; }
+  .step-btn {
+    background: var(--card);
+    border: 2px solid transparent;
+    color: var(--text);
+    border-radius: 12px;
+    padding: 10px 16px;
+    font-size: 0.98rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .step-btn:hover { transform: translateY(-2px); }
+  .step-btn.active { border-color: var(--accent); background: rgba(79,195,247,0.15); }
+
+  .panel {
+    display: none;
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 18px;
+    padding: 24px 22px;
+    animation: fadeIn .4s;
+  }
+  .panel.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
+
+  .panel h2 { font-size: 1.35rem; margin-bottom: 10px; }
+  .panel .explain { color: var(--muted); line-height: 1.9; margin-bottom: 18px; font-size: 1.05rem; }
+  .panel .explain b { color: var(--text); }
+
+  /* The recipe card (the skill itself) */
+  .recipe-wrap { display: flex; justify-content: center; }
+  .recipe {
+    background: linear-gradient(160deg, rgba(255,213,79,0.12), rgba(0,0,0,0.3));
+    border: 2px dashed var(--orange);
+    border-radius: 16px;
+    padding: 20px 24px;
+    max-width: 460px;
+    transform: rotate(-1.5deg);
+    transition: transform .25s;
+  }
+  .recipe:hover { transform: rotate(0deg) scale(1.02); }
+  .recipe .r-title {
+    font-size: 1.2rem; font-weight: 800; color: var(--orange);
+    margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+  }
+  .recipe .r-line { margin-bottom: 10px; line-height: 1.7; }
+  .recipe .r-line b { color: var(--accent); }
+  .recipe .r-line .tag {
+    background: rgba(0,0,0,0.35); border-radius: 6px;
+    padding: 2px 8px; font-size: 0.9rem; color: var(--muted);
+  }
+
+  .note {
+    background: rgba(79,195,247,0.1);
+    border-right: 4px solid var(--accent);
+    border-radius: 8px;
+    padding: 13px 16px;
+    line-height: 1.8;
+    margin-top: 16px;
+  }
+  .note.green { border-right-color: var(--green); background: rgba(102,187,106,0.1); }
+  .note b { color: var(--accent); }
+  .note.green b { color: var(--green); }
+
+  /* Demo: with / without */
+  .vs-btns { display: flex; justify-content: center; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
+  button.action {
+    border: none; color: #fff;
+    font-size: 1.05rem; font-weight: 700;
+    padding: 12px 26px; border-radius: 12px; cursor: pointer;
+    transition: transform .15s, box-shadow .15s, opacity .15s;
+  }
+  button.action:hover { transform: translateY(-2px); }
+  button.action:disabled { opacity: 0.45; cursor: default; transform: none; }
+  .btn-without { background: linear-gradient(90deg, #c62828, #ef5350); }
+  .btn-with { background: linear-gradient(90deg, #2e7d32, #66bb6a); }
+
+  .chat { display: flex; flex-direction: column; gap: 10px; min-height: 200px; }
+  .bubble {
+    max-width: 88%;
+    border-radius: 14px;
+    padding: 11px 16px;
+    line-height: 1.8;
+    font-size: 1rem;
+    animation: fadeIn .35s;
+  }
+  .bubble .who { display: block; font-size: 0.75rem; color: var(--muted); font-weight: 700; margin-bottom: 2px; }
+  .bubble.user { background: linear-gradient(135deg, #1565c0, #1e88e5); margin-left: auto; }
+  .bubble.ai { background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.12); margin-right: auto; }
+  .bubble.skill-load {
+    background: rgba(255,213,79,0.12);
+    border: 1.5px dashed var(--orange);
+    margin-right: auto;
+    color: var(--orange);
+    font-weight: 700;
+  }
+  .bubble.ai .good { color: var(--green); font-weight: 700; }
+  .timer {
+    text-align: center; font-weight: 800; font-size: 1.05rem;
+    margin-top: 14px; min-height: 28px;
+  }
+  .timer.bad { color: var(--red); }
+  .timer.good { color: var(--green); }
+
+  /* Benefits grid */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+  }
+  .benefit {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    padding: 18px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform .2s, border-color .2s;
+  }
+  .benefit:hover { transform: translateY(-4px); border-color: var(--accent); }
+  .benefit .b-icon { font-size: 2rem; margin-bottom: 8px; }
+  .benefit .b-title { font-weight: 800; margin-bottom: 6px; font-size: 1.05rem; }
+  .benefit .b-desc { color: var(--muted); font-size: 0.92rem; line-height: 1.6; }
+
+  /* Do / Don't */
+  .dd { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 640px) { .dd { grid-template-columns: 1fr; } }
+  .dd-col { border-radius: 14px; padding: 16px; }
+  .dd-col.do { background: rgba(102,187,106,0.08); border: 1px solid rgba(102,187,106,0.4); }
+  .dd-col.dont { background: rgba(239,83,80,0.08); border: 1px solid rgba(239,83,80,0.4); }
+  .dd-col h3 { margin-bottom: 12px; font-size: 1.1rem; }
+  .dd-col.do h3 { color: var(--green); }
+  .dd-col.dont h3 { color: var(--red); }
+  .dd-item {
+    background: rgba(0,0,0,0.25);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    line-height: 1.6;
+    font-size: 0.97rem;
+    cursor: pointer;
+    transition: transform .15s;
+  }
+  .dd-item:hover { transform: translateX(-4px); }
+  .dd-item .why { display: none; color: var(--muted); font-size: 0.88rem; margin-top: 6px; }
+  .dd-item.open .why { display: block; }
+
+  footer { text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 24px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🧰 מה זה Skill? ולמה הוא ישנה לכם את העבודה</h1>
+    <p>
+      ה-AI הוא כמו <b>עובד גאון חדש</b>: יודע המון על הכול —
+      אבל לא מכיר <b>את החברה שלכם</b>. Skill הוא הדרך ללמד אותו, פעם אחת ולתמיד.
+    </p>
+  </header>
+
+  <div class="steps">
+    <button class="step-btn active" data-step="1">1️⃣ מה זה?</button>
+    <button class="step-btn" data-step="2">2️⃣ ההבדל בפעולה</button>
+    <button class="step-btn" data-step="3">3️⃣ מה יוצא לי מזה?</button>
+    <button class="step-btn" data-step="4">4️⃣ איך משתמשים נכון</button>
+  </div>
+
+  <!-- STEP 1 -->
+  <section class="panel active" id="panel1">
+    <h2>שלב 1: Skill = דף הוראות שכותבים פעם אחת</h2>
+    <p class="explain">
+      דמיינו שגייסתם עובד מבריק. הוא יודע לכתוב, לנתח ולסכם — אבל הוא לא יודע
+      <b>איך עושים את זה אצלכם</b>: באיזה פורמט, באיזה טון, עם אילו דגשים.
+      בלי עזרה, תצטרכו להסביר לו את אותו הדבר <b>כל בוקר מחדש</b>.<br>
+      <b>Skill הוא בדיוק דף ההוראות הזה</b> — כמו מתכון או נוהל עבודה:
+      כותבים אותו פעם אחת, וה-AI שולף אותו בעצמו בכל פעם שהמשימה רלוונטית.
+    </p>
+
+    <div class="recipe-wrap">
+      <div class="recipe">
+        <div class="r-title">📋 Skill לדוגמה: "סיכום פגישה"</div>
+        <div class="r-line"><b>מתי להשתמש:</b> <span class="tag">כשמבקשים לסכם פגישה</span></div>
+        <div class="r-line"><b>הפורמט שלנו:</b> 3 חלקים — החלטות ✅, משימות עם אחראי ותאריך 📌, נושאים לפגישה הבאה ⏭️</div>
+        <div class="r-line"><b>הטון:</b> קצר וענייני, בלי מילים מיותרות</div>
+        <div class="r-line"><b>דוגמה מצורפת:</b> <span class="tag">סיכום אמיתי מפגישה קודמת</span></div>
+      </div>
+    </div>
+
+    <div class="note">
+      💡 שימו לב: זה לא קוד ולא קסם — זה <b>טקסט פשוט בעברית</b> (או בכל שפה).
+      כל עובד יכול לכתוב Skill, בדיוק כמו שכותבים נוהל למחליף בזמן חופשה.
+    </div>
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="panel" id="panel2">
+    <h2>שלב 2: אותה בקשה — שני עולמות</h2>
+    <p class="explain">
+      הבקשה: <b>"תכין סיכום לפגישת הצוות של היום"</b>. נסו את שתי הדרכים 👇
+    </p>
+
+    <div class="vs-btns">
+      <button class="action btn-without" id="btnWithout">😓 בלי Skill</button>
+      <button class="action btn-with" id="btnWith">😎 עם Skill</button>
+    </div>
+
+    <div class="chat" id="chat">
+      <div class="bubble ai"><span class="who">🤖</span>בחרו דרך כדי לראות מה קורה...</div>
+    </div>
+    <div class="timer" id="timer"></div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="panel" id="panel3">
+    <h2>שלב 3: מה ה-Skill נותן לעובד?</h2>
+    <p class="explain">לחצו על כל כרטיס כדי להבליט אותו — אלו ארבעת הרווחים הגדולים:</p>
+    <div class="grid">
+      <div class="benefit">
+        <div class="b-icon">⏱️</div>
+        <div class="b-title">חוסך זמן</div>
+        <div class="b-desc">מסבירים פעם אחת במקום כל פעם מחדש. הפינג-פונג של התיקונים — נעלם.</div>
+      </div>
+      <div class="benefit">
+        <div class="b-icon">🎯</div>
+        <div class="b-title">עקביות</div>
+        <div class="b-desc">אותו פורמט ואותה איכות — לא משנה מי בצוות מבקש, ומתי.</div>
+      </div>
+      <div class="benefit">
+        <div class="b-icon">🧠</div>
+        <div class="b-title">משמר ידע</div>
+        <div class="b-desc">ה"איך עושים אצלנו" כתוב ושמור — גם כשעובד מחליף תפקיד או עוזב.</div>
+      </div>
+      <div class="benefit">
+        <div class="b-icon">🚀</div>
+        <div class="b-title">כולם מומחים</div>
+        <div class="b-desc">עובד חדש מקבל תוצאות של ותיק — כבר מהיום הראשון.</div>
+      </div>
+    </div>
+    <div class="note green" style="margin-top:18px">
+      <b>המשפט לזכור:</b> בלי Skill אתם מלמדים את ה-AI מחדש בכל שיחה.
+      עם Skill — לימדתם פעם אחת, וכל החברה נהנית.
+    </div>
+  </section>
+
+  <!-- STEP 4 -->
+  <section class="panel" id="panel4">
+    <h2>שלב 4: איך משתמשים נכון? (לחצו על כל שורה להסבר)</h2>
+    <div class="dd">
+      <div class="dd-col do">
+        <h3>✅ כדאי</h3>
+        <div class="dd-item">Skill אחד = משימה אחת ברורה
+          <div class="why">"סיכום פגישה" — כן. "כל מה שקשור למסמכים" — לא. כשהמשימה ממוקדת, התוצאה מדויקת.</div></div>
+        <div class="dd-item">לכתוב מתי להשתמש בו
+          <div class="why">שורה ראשונה: "השתמש כשמבקשים לסכם פגישה". כך ה-AI יודע לשלוף את הדף הנכון בעצמו.</div></div>
+        <div class="dd-item">לצרף דוגמה אמיתית
+          <div class="why">דוגמה אחת טובה שווה אלף הסברים — בדיוק כמו עם עובד חדש.</div></div>
+        <div class="dd-item">לעדכן כשהנוהל משתנה
+          <div class="why">השתנה הפורמט? מעדכנים את ה-Skill פעם אחת — וכולם מיושרים מיד.</div></div>
+        <div class="dd-item">לשתף עם כל הצוות
+          <div class="why">הכוח האמיתי: Skill שכתב עובד אחד הופך לידע של כל הארגון.</div></div>
+      </div>
+      <div class="dd-col dont">
+        <h3>❌ לא כדאי</h3>
+        <div class="dd-item">לדחוס הכול ל-Skill ענק אחד
+          <div class="why">דף הוראות של 20 עמודים אף אחד לא קורא עד הסוף — גם לא AI. עדיף כמה קטנים וממוקדים.</div></div>
+        <div class="dd-item">הוראות מעורפלות
+          <div class="why">"תעשה שיהיה מקצועי" לא אומר כלום. "פתח בשורת תקציר של משפט אחד" — זו הוראה.</div></div>
+        <div class="dd-item">לשים סיסמאות ומידע רגיש
+          <div class="why">Skill הוא מסמך משותף. סודות, סיסמאות ופרטים אישיים — לא נכנסים לשם.</div></div>
+        <div class="dd-item">לכתוב ולשכוח
+          <div class="why">Skill שלא בדקתם על משימה אמיתית הוא ניחוש. נסו, תקנו, שפרו — כמו כל נוהל טוב.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>הדגמה חינוכית · Skill = נוהל עבודה שה-AI יודע לקרוא ולהפעיל בעצמו</footer>
+</div>
+
+<script>
+/* Step navigation */
+document.querySelectorAll('.step-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.step-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel' + btn.dataset.step).classList.add('active');
+  });
+});
+
+/* Step 2 demo */
+const chat = document.getElementById('chat');
+const timer = document.getElementById('timer');
+const btnWithout = document.getElementById('btnWithout');
+const btnWith = document.getElementById('btnWith');
+
+const WITHOUT = [
+  ['user', 'תכין סיכום לפגישת הצוות של היום'],
+  ['ai', 'בשמחה! הנה סיכום: בפגישה דיברנו על הפרויקט החדש, עלו נקודות מעניינות לגבי התקציב, והוחלט להמשיך לבדוק את הנושא...'],
+  ['user', 'זה לא הפורמט שלנו 😕 אנחנו תמיד מתחילים מהחלטות'],
+  ['ai', 'מצטער! הנה גרסה שמתחילה מהחלטות: הוחלט להמשיך בפרויקט...'],
+  ['user', 'חסרה טבלת משימות עם אחראי ותאריך יעד...'],
+  ['ai', 'אופס, מוסיף טבלה... (גרסה שלישית 🙃)'],
+  ['user', 'ומחר? אסביר את כל זה שוב מההתחלה? 😤'],
+];
+
+const WITH = [
+  ['user', 'תכין סיכום לפגישת הצוות של היום'],
+  ['skill', '📋 זוהתה משימת סיכום פגישה — טוען את Skill "סיכום פגישה" של החברה...'],
+  ['ai', '<span class="good">✅ החלטות:</span> אושר תקציב לרבעון הבא · נדחתה הרחבת הצוות<br><span class="good">📌 משימות:</span> דנה — טיוטת תקציב (עד יום ה\') · יוסי — תיאום עם ספק (עד שני)<br><span class="good">⏭️ לפגישה הבאה:</span> סטטוס גיוס, תוצאות הפיילוט'],
+  ['user', 'מושלם. בפעם הראשונה! 🤩'],
+];
+
+let playing = false;
+async function play(script, badEnd) {
+  if (playing) return;
+  playing = true;
+  btnWithout.disabled = btnWith.disabled = true;
+  chat.innerHTML = '';
+  timer.textContent = '';
+  timer.className = 'timer';
+  for (const [who, text] of script) {
+    await new Promise(r => setTimeout(r, 950));
+    const b = document.createElement('div');
+    b.className = 'bubble ' + (who === 'user' ? 'user' : who === 'skill' ? 'skill-load' : 'ai');
+    b.innerHTML = (who === 'user' ? '<span class="who">👤 עובד</span>' :
+                   who === 'skill' ? '' : '<span class="who">🤖 AI</span>') + text;
+    chat.appendChild(b);
+    b.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+  await new Promise(r => setTimeout(r, 600));
+  if (badEnd) {
+    timer.textContent = '⏱️ 20 דקות, 3 גרסאות — ומחר הכול מחדש';
+    timer.className = 'timer bad';
+  } else {
+    timer.textContent = '⚡ 20 שניות, גרסה אחת — וזה עובד כך לכל הצוות, כל יום';
+    timer.className = 'timer good';
+  }
+  btnWithout.disabled = btnWith.disabled = false;
+  playing = false;
+}
+
+btnWithout.addEventListener('click', () => play(WITHOUT, true));
+btnWith.addEventListener('click', () => play(WITH, false));
+
+/* Step 3: highlight benefit on click */
+document.querySelectorAll('.benefit').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.benefit').forEach(x => x.style.borderColor = '');
+    b.style.borderColor = 'var(--green)';
+  });
+});
+
+/* Step 4: expand reasons */
+document.querySelectorAll('.dd-item').forEach(item => {
+  item.addEventListener('click', () => item.classList.toggle('open'));
+});
+</script>
+</body>
+</html>
